@@ -1,6 +1,8 @@
 import nltk
 from nltk.corpus import stopwords
+nltk.download('stopwords')
 from nltk.tokenize import word_tokenize
+import os, sys
 
 #  set of commonly used words such as "the", "a", "in" etc.
 englishStopWords = set(stopwords.words('english'))
@@ -45,3 +47,6 @@ unreliableSources = ["Activist Post", "Addicting Info", "Alternative Media Syndi
 
 reliableHTMLTags = []
 unreliableHTMLTags = []
+
+#  listdir() returns a list containing the names of the entries in the directory path given
+months = os.listdir("C:/NELA2017/NELA2017.tar/NELA2017")
