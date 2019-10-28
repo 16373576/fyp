@@ -1,7 +1,10 @@
-import nltk
+import json
+import os
+from collections import Counter
+
+from nltk import FreqDist
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-import os, sys, json
 
 # define variables
 articles_path = []
@@ -11,6 +14,7 @@ htmlData = []
 contentData = []
 tokenHtml = []
 tokenContent = []
+summary = {}
 reliableHTMLTags = []
 unreliableHTMLTags = []
 
@@ -78,6 +82,7 @@ for m in month_directories:  # go through all items in month_directories and get
 for s in sources:
     # clear the html data for each source
     htmlData.clear()
+    summary.clear()
     for p in articles_path:
         for d in p.date:
             fileFound = True
@@ -97,20 +102,38 @@ for s in sources:
                     articleData.clear()
 
                     if articleTitle != "PaxHeader":
-                        #  open the file and specify mode (read, write, etc.)
-                        file = open("C:/NELA2017/NELA2017.tar/NELA2017/" + p.month + "/" + d + "/" + s + "/" + articleTitle,
-                                    'rb')
-                        articleData = json.load(file)
+                        # open the file and specify mode (read, write, etc.)
+                        # using the keyword "with automatically closes the file afterwards
+                        with open("C:/NELA2017/NELA2017.tar/NELA2017/" + p.month + "/" + d + "/" + s + "/" +
+                                  articleTitle, 'rb') as file:
+                            try:
+                                articleData = json.load(file)
 
-                        # save html and content of the json file separately
-                        tokenHtml = word_tokenize(articleData['html'])
-                        tokenContent = word_tokenize(articleData['content'])
+                                # save html and content of the json file separately
+                                tokenHtml = word_tokenize(articleData['html'])
+                                # tokenContent = word_tokenize(articleData['content'])
 
-                        # add only the HTML tags from the tokenized data to create a list of all HTML tags for that source
-                        previousToken = " "
-                        for token in tokenHtml:
-                            if len(token) > 1 and token[0] == "/" and token[1] != "/" and previousToken == "<":
-                                htmlData.append(token)
-                            previousToken = token
+                                # add HTML tags from the tokenized data to create a list of all tags for that source
+                                previousToken = " "
+                                for token in tokenHtml:
+                                    if len(token) > 1 and token[0] == "/" and token[1] != "/" and previousToken == "<":
+                                        htmlData.append(token)
+                                    previousToken = token
+                            except ValueError:
+                                print("JsonDecodeError for file " + articleTitle)
+
+    # count the number of occurrences of each tag, order the top 100 and save to a .txt file under the source name
+    summary = Counter(htmlData).most_common(100)
+    with open("C:/Users/caire/Desktop/OutputData/OutputHtml/" + s + ".txt", 'w') as newFile:
+        json.dump(summary, newFile)
     print(s)
-    print(htmlData)
+    print(summary)
+    if s in reliableSources:
+        reliableHTMLTags.extend(htmlData)
+    elif s in unreliableSources:
+        unreliableHTMLTags.extend(htmlData)
+with open("C:/Users/caire/Desktop/OutputData/OutputHtml/reliableTags.txt", 'w') as newFile:
+    json.dump(Counter(reliableHTMLTags).most_common(100), newFile)
+
+with open("C:/Users/caire/Desktop/OutputData/OutputHtml/unreliableTags.txt", 'w') as newFile:
+    json.dump(Counter(unreliableHTMLTags).most_common(100), newFile)
