@@ -34,10 +34,10 @@ sources = ["AP", "BBC", "Business Insider", "CBS News", "CNBC", "CNN", "Counter 
            "Daily Mail", "Daily Stormer", "DC Gazette", "Drudge Report", "End the Fed", "Faking News",
            "Fox News", "Freedom Daily", "Freedom Outpost", "FrontPage Magazine", "Fusion", "Hang The Bankers",
            "Infowars", "Intellihub", "Investors Business Daily", "Liberty Writers", "National Report", "Natural News",
-           "New York Daily News", "New York Post", "News Busters", "Newslo", "NODISINFO", "Observer",
+           "New York Daily News", "New York Post", "NewsBusters", "Newslo", "NODISINFO", "Observer",
            "Occupy Democrats", "Palmer Report", "Prntly", "Raw Story", "Real News Right Now", "RedState",
-           "RT", "Shareblue", "The Beaverton", "The Chaser", "The DC Clothesline", "The Duran",
-           "The Gateway Pundit", "The Huffington Post", "The Right Scope", "The Shovel", "The Spoof",
+           "RT", "Shareblue", "The Beaverton", "The Chaser", "The D.C. Clothesline", "The Duran",
+           "The Gateway Pundit", "The Huffington Post", "The Right Scoop", "The Shovel", "The Spoof",
            "TheBlaze", "ThinkProgress", "True Pundit", "TruthFeed", "USA Politics Now", "USA Today",
            "Veterans Today", "Washington Examiner", "World News Politics", "Yahoo News"]
 
@@ -53,10 +53,10 @@ unreliableSources = ["Activist Post", "Addicting Info", "Alternative Media Syndi
                      "DC Gazette", "Drudge Report", "End the Fed", "Faking News", "Fox News", "Freedom Daily",
                      "Freedom Outpost", "FrontPage Magazine", "Fusion", "Hang The Bankers", "Infowars", "Intellihub",
                      "Investors Business Daily", "Liberty Writers", "National Report", "Natural News",
-                     "New York Daily News", "New York Post", "News Busters", "Newslo", "NODISINFO", "Observer",
+                     "New York Daily News", "New York Post", "NewsBusters", "Newslo", "NODISINFO", "Observer",
                      "Occupy Democrats", "Palmer Report", "Prntly", "Raw Story", "Real News Right Now", "RedState",
-                     "RT", "Shareblue", "The Beaverton", "The Chaser", "The DC Clothesline", "The Duran",
-                     "The Gateway Pundit", "The Huffington Post", "The Right Scope", "The Shovel", "The Spoof",
+                     "RT", "Shareblue", "The Beaverton", "The Chaser", "The D.C. Clothesline", "The Duran",
+                     "The Gateway Pundit", "The Huffington Post", "The Right Scoop", "The Shovel", "The Spoof",
                      "TheBlaze", "ThinkProgress", "True Pundit", "TruthFeed", "USA Politics Now", "USA Today",
                      "Veterans Today", "Washington Examiner", "World News Politics", "Yahoo News"]
 
