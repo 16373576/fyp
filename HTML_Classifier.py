@@ -39,7 +39,7 @@ sources = ["AP", "BBC", "Business Insider", "CBS News", "CNBC", "CNN", "Counter 
            "RT", "Shareblue", "The Beaverton", "The Chaser", "The DC Clothesline", "The Duran",
            "The Gateway Pundit", "The Huffington Post", "The Right Scope", "The Shovel", "The Spoof",
            "TheBlaze", "ThinkProgress", "True Pundit", "TruthFeed", "USA Politics Now", "USA Today",
-           "Veterans Today", "Washington Examiner", "World News Politics", "Yahoo News", "Young Conservatives"] #"CNS News"
+           "Veterans Today", "Washington Examiner", "World News Politics", "Yahoo News"]
 
 #  a sublist of the sources that have been deemed reliable after research
 reliableSources = ["AP", "BBC", "Business Insider", "CBS News", "CNBC", "CNN", "Counter Current News",
@@ -49,7 +49,7 @@ reliableSources = ["AP", "BBC", "Business Insider", "CBS News", "CNBC", "CNN", "
 
 #  a sublist of the sources that have been deemed unreliable after research
 unreliableSources = ["Activist Post", "Addicting Info", "Alternative Media Syndicate", "Bipartisan Report", "Breitbart",
-                     "BuzzFeed", "CNS News", "Conservative Tribune", "Daily Kos", "Daily Mail", "Daily Stormer",
+                     "BuzzFeed", "Conservative Tribune", "Daily Kos", "Daily Mail", "Daily Stormer",
                      "DC Gazette", "Drudge Report", "End the Fed", "Faking News", "Fox News", "Freedom Daily",
                      "Freedom Outpost", "FrontPage Magazine", "Fusion", "Hang The Bankers", "Infowars", "Intellihub",
                      "Investors Business Daily", "Liberty Writers", "National Report", "Natural News",
@@ -58,8 +58,7 @@ unreliableSources = ["Activist Post", "Addicting Info", "Alternative Media Syndi
                      "RT", "Shareblue", "The Beaverton", "The Chaser", "The DC Clothesline", "The Duran",
                      "The Gateway Pundit", "The Huffington Post", "The Right Scope", "The Shovel", "The Spoof",
                      "TheBlaze", "ThinkProgress", "True Pundit", "TruthFeed", "USA Politics Now", "USA Today",
-                     "Veterans Today", "Washington Examiner", "World News Politics", "Yahoo News",
-                     "Young Conservatives"]
+                     "Veterans Today", "Washington Examiner", "World News Politics", "Yahoo News"]
 
 #  listdir() returns a list containing the names of the entries in the directory path given
 # ['1_April', '2_May', '3_June', '4_July', '5_August', '6_September', '7_October'] is returned from NELA2017
@@ -141,7 +140,7 @@ for s in sources:
     elif s in unreliableSources:
         unreliableHTMLTags = Counter(unreliableHTMLTags) + Counter(summary)
 with open("C:/Users/caire/Desktop/OutputData/OutputHtml/reliableTags.txt", 'w') as newFile:
-    json.dump(Counter(reliableHTMLTags).most_common(100), newFile)
+    json.dump(Counter(reliableHTMLTags), newFile)
 
 with open("C:/Users/caire/Desktop/OutputData/OutputHtml/unreliableTags.txt", 'w') as newFile:
-    json.dump(Counter(unreliableHTMLTags).most_common(100), newFile)
+    json.dump(Counter(unreliableHTMLTags), newFile)
