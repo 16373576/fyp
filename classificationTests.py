@@ -8,11 +8,8 @@ def main():
     df = pd.read_csv('C:/Users/caire/OneDrive/Documents/forth yr semester 1/Final Year Project/HTMLTagsFrequency.csv',
                      header=0, delimiter=",")
     data = df.values[:, :305]
-    print("data")
-    print(data)
     labels = df.values[:, 307]
-    print("labels")
-    print(labels)
+
     knn = KNeighborsClassifier(n_neighbors=5)
     lsvm = LinearSVC()
 
