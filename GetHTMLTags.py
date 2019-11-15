@@ -118,7 +118,8 @@ for s in sources:
                                     # add HTML tags from the tokenized data to create a list of all tags for that source
                                     previousToken = " "
                                     for token in tokenHtml:
-                                        if len(token) > 1 and token[0] == "/" and token[1] != "/" and previousToken == "<":
+                                        if len(token) > 1 and token[0] == "/" and token[
+                                            1] != "/" and previousToken == "<":
                                             htmlData.append(token)
                                         previousToken = token
                                 except ValueError:
