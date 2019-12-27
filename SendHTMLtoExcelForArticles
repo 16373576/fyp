@@ -1,0 +1,85 @@
+import json
+import os
+import numpy as np
+
+
+def main():
+    #  a subset of all sources for the articles in the NELA2017 dataset
+    sources = ["AP", "BBC", "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed", "Drudge Report", "Faking News",
+               "RedState", "The Gateway Pundit", "The Huffington Post"]
+
+    # initialize variables
+    lineDict = {}
+    listForExcel = []
+    listOfTags = []
+    listOfDictionaryValues = []
+
+    # get list of all tags in Nela dataset
+    listOfTags = get_list_of_all_tags()
+
+    # sort the dictionaries
+    sort_tags(listOfTags, sources)
+
+    # create a numpy array to send to csv file
+    listOfDictionaryValues.append(str(list(listOfTags)))
+    for s in sources:
+        with open("C:/Users/caire/Desktop/OutputData/OutputHtmlArticlesSorted/" + s + ".txt") as file:
+            for cnt, line in enumerate(file):
+                line = line.replace("Counter(", "").replace(")", "")
+                lineDict = eval(line)
+                listOfDictionaryValues.append(str(list(lineDict.values())) + s)
+    listForExcel = np.hstack(listOfDictionaryValues)
+    np.savetxt("C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/outputTagCountForExcelArticles.csv", listForExcel,
+               delimiter="\n", fmt='%s')
+
+
+def get_list_of_all_tags():
+    listOfAllTags = []
+
+    # get a list of all tags
+    with open("C:/Users/caire/Desktop/OutputData/OutputHtml/" + "unreliableTags" + ".txt") as file:
+        unreliableTags = json.load(file)
+    with open("C:/Users/caire/Desktop/OutputData/OutputHtml/" + "reliableTags" + ".txt") as file:
+        reliableTags = json.load(file)
+    # add all unreliable tags to the list
+    for unreliableKey in unreliableTags.keys():
+        listOfAllTags.append(unreliableKey)
+
+    # add any reliable tags that weren't in unreliable to the list also
+    for reliableKey in reliableTags.keys():
+        if reliableKey not in unreliableTags:
+            listOfAllTags.append(reliableKey)
+    return listOfAllTags
+
+
+def sort_tags(list_of_tags, sources):
+    for s in sources:
+        if not os.path.isfile("C:/Users/caire/Desktop/OutputData/OutputHtmlArticlesSorted/" + s + ".txt"):
+            dictKey = {}
+            sortedArticles = []
+            print(s)
+            with open("C:/Users/caire/Desktop/OutputData/OutputHtmlArticles/" + s + ".txt") as file:
+                for cnt, line in enumerate(file):
+                    line = line.replace("Counter(", "").replace(")", "")
+                    print("Line {}: {}".format(cnt, line))
+                    if not line:
+                        continue
+                    lineDict = eval(line)
+
+                    # update the dict of each article in source with 0 if a tags from the list of all tags isn't in the dict
+                    for tag in list_of_tags:
+                        if tag not in lineDict:
+                            dictKey = {tag: 0}
+                            lineDict.update(dictKey)
+
+                    # reorder the dictionaries to match the order of the list of all tags
+                    sortedDict = {}
+                    sortedDict.clear()
+                    for tag in list_of_tags:
+                        getDictValues = {tag: lineDict[tag]}
+                        sortedDict.update(getDictValues)
+                    with open("C:/Users/caire/Desktop/OutputData/OutputHtmlArticlesSorted/" + s + ".txt", 'a') as newFile:
+                        newFile.write(str(sortedDict) + "\n")
+
+
+main()
