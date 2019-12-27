@@ -93,7 +93,6 @@ for s in sources:
                     #  ['AP--2017-04-17--Absences fitness atmosphere _ new ways to track schools.txt',.....]
                     articleTitles = os.listdir("C:/NELA2017/NELA2017.tar/NELA2017/" + p.month + "/" + d + "/" + s)
                 except FileNotFoundError:
-                    # print("file not found for " + s + " on the " + d)
                     fileFound = False
 
                 if fileFound:  # if the source had articles on that date open all articles using articleTitles list
@@ -127,13 +126,13 @@ for s in sources:
 
         # count the number of occurrences of each tag, order the top 100 and save to a .txt file under the source name
         summary = Counter(htmlData)
-        with open("C:/Users/caire/Desktop/OutputData/OutputHtml/" + s + ".txt", 'w') as newFile:
+        with open("C:/Users/caire/Desktop/OutputData/OutputHtmlArticles/" + s + ".txt", 'w') as newFile:
             json.dump(summary, newFile)
         print(s)
         print(summary)
 
     else:
-        with open("C:/Users/caire/Desktop/OutputData/OutputHtml/" + s + ".txt") as file:
+        with open("C:/Users/caire/Desktop/OutputData/OutputHtmlArticles/" + s + ".txt") as file:
             summary = json.load(file)
 
     if s in reliableSources:
