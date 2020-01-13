@@ -89,7 +89,8 @@ for s in sources:
                                         previousToken = token
                                 except ValueError:
                                     print("JsonDecodeError for file " + articleTitle)
-                        with open("C:/Users/caire/Desktop/OutputData/OutputHtmlArticles/" + s + ".txt", 'a') as newFile:
-                            newFile.write(str(Counter(htmlData)) + "\n")
+                        if len(htmlData) != 0:
+                            with open("C:/Users/caire/Desktop/OutputData/OutputHtmlArticles/" + s + ".txt", 'a') as newFile:
+                                newFile.write(str(Counter(htmlData)) + "\n")
                         htmlData.clear()
     print(s + "'s tags counted for each article and added to file")

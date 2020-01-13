@@ -1,9 +1,12 @@
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.svm import LinearSVC
+from sklearn.svm import SVC
 import pandas as pd
 from sklearn import tree, metrics
+from sklearn.metrics import roc_curve
+from sklearn.metrics import roc_auc_score
+from matplotlib import pyplot
 
 feature_names = ['/title', '/script', '/style', '/noscript', '/div', '/head', '/a', '/li', '/ul', '/nav', '/i', '/span',
                  '/h1', '/h2', '/ins', '/aside', '/section', '/label', '/form', '/header', '/p', '/strong', '/b', '/h3',
@@ -43,8 +46,9 @@ feature_names = ['/title', '/script', '/style', '/noscript', '/div', '/head', '/
                  '/EM', '/Center', '/h4but', '/h', '/xxx', '/scr+ipt', '/wbr', '/asset-code', "/'+'div", '/hp', '/tt',
                  '/cnt', '/image', '/asset_inline', "/scri'+'pt", '/I', '/ll', '/pullquote', '/scrip', '/customspan']
 
-df = pd.read_csv('C:/Users/caire/OneDrive/Documents/forth yr semester 1/Final Year Project/HTMLTagsIndividualArticlesNormalized.csv',
-                 header=0, delimiter=",")
+df = pd.read_csv(
+    'C:/Users/caire/OneDrive/Documents/forth yr semester 1/Final Year Project/HTMLTagsIndividualArticlesNormalized.csv',
+    header=0, delimiter=",")
 
 labels = df["Reliability"]
 data_before_feature_sel = df.values[:, :305]
@@ -60,58 +64,59 @@ train_split = int((len(data) * 2) / 3)
 training = data.values[0:train_split]
 test = data.values[train_split - 1:]
 
-lsvm_learningCurve_accuracy = []
-knn_learningCurve_accuracy = []
-clf_learningCurve_accuracy = []
-naive_learningCurve_accuracy = []
-print(len(training))
-# get data for learning curves and save to file to be used in excel
-for instances in range(11, len(training), 502):
-    print(instances)
-    knn = KNeighborsClassifier(n_neighbors=11)
-    knn.fit(training[0:instances, :4], training[0:instances, 5])
-    knn_test_predictions = knn.predict(test[:, :4])
-    knn_learningCurve_accuracy.append((metrics.accuracy_score(test[:, -1], knn_test_predictions)) * 100)
+# fit all models to the data and make predictions
+knn = KNeighborsClassifier(n_neighbors=11)
+knn.fit(training[:, :4], training[:, 5])
+knn_test_predictions = knn.predict_proba(test[:, :4])
 
-    lsvm = LinearSVC()
-    lsvm.fit(training[0:instances, :4], training[0:instances, 5])
-    lsvm_test_predictions = lsvm.predict(test[:, :4])
-    lsvm_learningCurve_accuracy.append((metrics.accuracy_score(test[:, -1], lsvm_test_predictions)) * 100)
+lsvm = SVC(kernel="linear", probability=True)
+lsvm.fit(training[:, :4], training[:, 5])
+lsvm_test_predictions = lsvm.predict_proba(test[:, :4])
 
-    clf = tree.DecisionTreeClassifier()
-    clf.fit(training[0:instances, :4], training[0:instances, 5])
-    clf_test_predictions = clf.predict(test[:, :4])
-    clf_learningCurve_accuracy.append((metrics.accuracy_score(test[:, -1], clf_test_predictions)) * 100)
+clf = tree.DecisionTreeClassifier()
+clf.fit(training[:, :4], training[:, 5])
+clf_test_predictions = clf.predict_proba(test[:, :4])
 
-    naive = GaussianNB()
-    naive.fit(training[0:instances, :4], training[0:instances, 5])
-    naive_test_predictions = naive.predict(test[:, :4])
-    naive_learningCurve_accuracy.append((metrics.accuracy_score(test[:, -1], naive_test_predictions)) * 100)
+naive = GaussianNB()
+naive.fit(training[:, :4], training[:, 5])
+naive_test_predictions = naive.predict_proba(test[:, :4])
 
-print(lsvm_learningCurve_accuracy)
-print(knn_learningCurve_accuracy)
-print(clf_learningCurve_accuracy)
-print(naive_learningCurve_accuracy)
-newFile = open("C:/Users/caire/PycharmProjects/fyp/LearningCurveIndividualArticles.csv", 'a+')
-newFile.write(str(lsvm_learningCurve_accuracy))
-newFile.write(str(knn_learningCurve_accuracy))
-newFile.write(str(clf_learningCurve_accuracy))
-newFile.write(str(naive_learningCurve_accuracy))
-newFile.close()
+# keep probabilities for the positive outcome only
+knn_test_predictions = knn_test_predictions[:, 1]
+lsvm_test_predictions = lsvm_test_predictions[:, 1]
+clf_test_predictions = clf_test_predictions[:, 1]
+naive_test_predictions = naive_test_predictions[:, 1]
 
-print("KNN")
-print(confusion_matrix(test[:, -1], knn_test_predictions))
-print(classification_report(test[:, -1], knn_test_predictions))
+# calculate ROC AUC scores
+knn_auc = roc_auc_score(test[:, 5], knn_test_predictions)
+lsvm_auc = roc_auc_score(test[:, 5], lsvm_test_predictions)
+clf_auc = roc_auc_score(test[:, 5], clf_test_predictions)
+naive_auc = roc_auc_score(test[:, 5], naive_test_predictions)
 
-print("LSVM")
-print(confusion_matrix(test[:, -1], lsvm_test_predictions))
-print(classification_report(test[:, -1], lsvm_test_predictions))
+# summarize scores
+print('KNN: ROC AUC=%.3f' % (knn_auc))
+print('LSVM: ROC AUC=%.3f' % (lsvm_auc))
+print('CART: ROC AUC=%.3f' % (clf_auc))
+print('Naive: ROC AUC=%.3f' % (naive_auc))
 
-print("CART")
-print(confusion_matrix(test[:, -1], clf_test_predictions))
-print(classification_report(test[:, -1], clf_test_predictions))
+# calculate roc curves
+knn_fpr, knn_tpr, _ = roc_curve(test[:, 5], knn_test_predictions)
+lsvm_fpr, lsvm_tpr, _ = roc_curve(test[:, 5], lsvm_test_predictions)
+clf_fpr, clf_tpr, _ = roc_curve(test[:, 5], clf_test_predictions)
+naive_fpr, naive_tpr, _ = roc_curve(test[:, 5], naive_test_predictions)
 
-print("Naive")
-print(confusion_matrix(test[:, -1], naive_test_predictions))
-print(classification_report(test[:, -1], naive_test_predictions))
+# plot the roc curve for the model
+pyplot.plot(knn_fpr, knn_tpr, marker='.', label='KNN')
+pyplot.plot(lsvm_fpr, lsvm_tpr, marker='.', label='LSVM')
+pyplot.plot(clf_fpr, clf_tpr, marker='.', label='CART')
+pyplot.plot(naive_fpr, naive_tpr, marker='.', label='Naive')
 
+# axis labels
+pyplot.title('ROC curve')
+pyplot.xlabel('False Positive Rate')
+pyplot.ylabel('True Positive Rate')
+# show the legend
+pyplot.legend()
+pyplot.savefig('ROCcurve.png', bbox_inches='tight')
+# show the plot
+pyplot.show()

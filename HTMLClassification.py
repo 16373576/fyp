@@ -49,10 +49,20 @@ def main():
                      '/asset-code', "/'+'div", '/hp', '/tt', '/cnt', '/image', '/asset_inline', "/scri'+'pt", '/I',
                      '/ll', '/pullquote', '/scrip', '/customspan']
 
-    df = pd.read_csv('C:/Users/caire/OneDrive/Documents/forth yr semester 1/Final Year Project/HTMLTagsFrequency.csv',
+    # df = pd.read_csv('C:/Users/caire/OneDrive/Documents/forth yr semester 1/Final Year Project/HTMLTagsFrequency.csv',
+    #                  header=0, delimiter=",")
+    df = pd.read_csv('C:/Users/caire/OneDrive/Documents/forth yr semester 1/Final Year Project/HTMLTagsIndividualArticlesNormalized.csv',
                      header=0, delimiter=",")
-    data = df.values[:, :305]
-    labels = df.values[:, 307]
+
+    labels = df["reliability"]
+    # data = df.values[:, :305]
+    data_before_feature_sel = df.values[:, :305]
+    cor = df.corr(method='pearson')
+    cor_target = abs(cor["Reliability"])
+    relevant_features = cor_target[cor_target > 0.35]
+    print(relevant_features)
+    data = df[[relevant_features.index[0], relevant_features.index[1], relevant_features.index[2],
+               relevant_features.index[3], relevant_features.index[4]]]
 
     knn = KNeighborsClassifier(n_neighbors=11)
     lsvm = LinearSVC()
@@ -70,7 +80,8 @@ def main():
     # print out the sklearn decision tree
     dtree = dtreeplt(model=clf, feature_names=feature_names, target_names=["reliable", "unreliable"])
     fig = dtree.view()
-    fig.savefig('DecisionTree.png')
+    #fig.savefig('DecisionTree.png')
+    fig.savefig('ArticleDecisionTree.png')
 
 
 # checks the results of the algorithms using 10-fold cross-validation and prints out the results
