@@ -39,4 +39,5 @@ plt.plot(range(1, 200, 10), error, color='red', linestyle='dashed', marker='o',
 plt.title('Error Rate K Value')
 plt.xlabel('K Value')
 plt.ylabel('Mean Error')
+plt.savefig('KValue.png', bbox_inches='tight')
 plt.show()
