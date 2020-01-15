@@ -2,6 +2,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC
+from sklearn.linear_model import LogisticRegression
 import pandas as pd
 from sklearn import tree
 from dtreeplt import dtreeplt
@@ -51,10 +52,10 @@ def main():
 
     # df = pd.read_csv('C:/Users/caire/OneDrive/Documents/forth yr semester 1/Final Year Project/HTMLTagsFrequency.csv',
     #                  header=0, delimiter=",")
-    df = pd.read_csv('C:/Users/caire/OneDrive/Documents/forth yr semester 1/Final Year Project/HTMLTagsIndividualArticlesNormalized.csv',
+    df = pd.read_csv('C:/Users/caire/OneDrive/Documents/forth yr semester 1/Final Year Project/HTMLTagsIndividualArticlesNormalizedMinMax.csv',
                      header=0, delimiter=",")
 
-    labels = df["reliability"]
+    labels = df["Reliability"]
     # data = df.values[:, :305]
     data_before_feature_sel = df.values[:, :305]
     cor = df.corr(method='pearson')
@@ -70,12 +71,15 @@ def main():
     clf.fit(data, labels)
     naive = GaussianNB()
     naive.fit(data, labels)
+    logReg = LogisticRegression()
+    logReg.fit(data, labels)
 
     # Applies KNN, LSVM and decision tree algorithms to data, then checks the results using 10 fold cross-validation
     cross_validation_test(knn, "KNN", data, labels)
     cross_validation_test(lsvm, "LSVM", data, labels)
     cross_validation_test(clf, "CART", data, labels)
     cross_validation_test(naive, "Naive Bayes Model", data, labels)
+    cross_validation_test(logReg, "logistic regression", data, labels)
 
     # print out the sklearn decision tree
     dtree = dtreeplt(model=clf, feature_names=feature_names, target_names=["reliable", "unreliable"])
