@@ -50,21 +50,19 @@ def main():
                      '/asset-code', "/'+'div", '/hp', '/tt', '/cnt', '/image', '/asset_inline', "/scri'+'pt", '/I',
                      '/ll', '/pullquote', '/scrip', '/customspan']
 
-    # df = pd.read_csv('C:/Users/caire/OneDrive/Documents/forth yr semester 1/Final Year Project/HTMLTagsFrequency.csv',
-    #                  header=0, delimiter=",")
-    df = pd.read_csv('C:/Users/caire/OneDrive/Documents/forth yr semester 1/Final Year Project/HTMLTagsIndividualArticlesNormalizedMinMax.csv',
-                     header=0, delimiter=",")
+    # read in the data from the .csv file and shuffle
+    df = pd.read_csv(
+        'C:/Users/caire/OneDrive/Documents/forth yr semester 1/Final Year Project/HTMLTagsArticlesCombinedNormalized.csv',
+        header=0, delimiter=",")
+    df = df.sample(frac=1)
 
+    # assign the labels as the Reliability column
     labels = df["Reliability"]
-    # data = df.values[:, :305]
-    data_before_feature_sel = df.values[:, :305]
-    cor = df.corr(method='pearson')
-    cor_target = abs(cor["Reliability"])
-    relevant_features = cor_target[cor_target > 0.35]
-    print(relevant_features)
-    data = df[[relevant_features.index[0], relevant_features.index[1], relevant_features.index[2],
-               relevant_features.index[3], relevant_features.index[4]]]
 
+    # conduct feature selection so the algorithms will run faster as now only the 5 most related attributes are used
+    data = feature_selection(df)
+
+    # initialise the algorithms and fit to the data
     knn = KNeighborsClassifier(n_neighbors=11)
     lsvm = LinearSVC()
     clf = tree.DecisionTreeClassifier()
@@ -74,7 +72,7 @@ def main():
     logReg = LogisticRegression()
     logReg.fit(data, labels)
 
-    # Applies KNN, LSVM and decision tree algorithms to data, then checks the results using 10 fold cross-validation
+    # run 10 fold cross-validation
     cross_validation_test(knn, "KNN", data, labels)
     cross_validation_test(lsvm, "LSVM", data, labels)
     cross_validation_test(clf, "CART", data, labels)
@@ -84,7 +82,7 @@ def main():
     # print out the sklearn decision tree
     dtree = dtreeplt(model=clf, feature_names=feature_names, target_names=["reliable", "unreliable"])
     fig = dtree.view()
-    #fig.savefig('DecisionTree.png')
+    # fig.savefig('DecisionTree.png')
     fig.savefig('ArticleDecisionTree.png')
 
 
@@ -93,6 +91,17 @@ def cross_validation_test(algorithm, algorithm_name, data, results):
     scores = cross_val_score(algorithm, data, results, cv=10)
     print(algorithm_name + ":\n" + str(scores))
     print("Accuracy: {:0.4} (+/- {:0.3})\n".format(scores.mean(), scores.std() * 2))
+
+
+# method to find the attributes with highest correlation to the class
+def feature_selection(dataframe):
+    cor = dataframe.corr(method='pearson')
+    cor_target = abs(cor["Reliability"])
+    relevant_features = cor_target[cor_target > 0.3]
+    print(relevant_features)
+    data = dataframe[[relevant_features.index[0], relevant_features.index[1], relevant_features.index[2],
+                      relevant_features.index[3], relevant_features.index[4]]]
+    return data
 
 
 main()
