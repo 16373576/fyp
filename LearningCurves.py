@@ -5,6 +5,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.svm import LinearSVC
 import pandas as pd
 from sklearn import tree, metrics
+from matplotlib import pyplot
 
 
 def main():
@@ -13,10 +14,7 @@ def main():
                      header=0, delimiter=",")
     df = df.sample(frac=1)
 
-    # assign the column "Reliability" as the labels
-    labels = df["Reliability"]
-
-    # find the attributes with teh highest correlation to the class
+    # find the attributes with the highest correlation to the class
     cor = df.corr(method='pearson')
     cor_target = abs(cor["Reliability"])
     relevant_features = cor_target[cor_target > 0.3]
@@ -35,13 +33,15 @@ def main():
     clf_learningCurve_accuracy = []
     naive_learningCurve_accuracy = []
     logReg_learningCurve_accuracy = []
+    instance = []
 
     # used to track how many more instances may exist
     print(len(training))
 
     # get data for learning curves and save to file to be used in excel
-    for instances in range(11, len(training), 502):
+    for instances in range(11, len(training), 1502):
         print(instances)
+        instance.append(instances)
         knn = KNeighborsClassifier(n_neighbors=11)
         knn.fit(training[0:instances, :4], training[0:instances, 5])
         knn_test_predictions = knn.predict(test[:, :4])
@@ -67,21 +67,22 @@ def main():
         logReg_test_predictions = logReg.predict(test[:, :4])
         logReg_learningCurve_accuracy.append((metrics.accuracy_score(test[:, -1], logReg_test_predictions)) * 100)
 
-    # print the results
-    print(lsvm_learningCurve_accuracy)
-    print(knn_learningCurve_accuracy)
-    print(clf_learningCurve_accuracy)
-    print(naive_learningCurve_accuracy)
-    print(logReg_learningCurve_accuracy)
+    # plot the roc curve for the model
+    pyplot.plot(instance, knn_learningCurve_accuracy, marker='.', label='KNN')
+    pyplot.plot(instance, lsvm_learningCurve_accuracy, marker='.', label='LSVM')
+    pyplot.plot(instance, clf_learningCurve_accuracy, marker='.', label='CART')
+    pyplot.plot(instance, naive_learningCurve_accuracy, marker='.', label='Naive Bayes')
+    pyplot.plot(instance, logReg_learningCurve_accuracy, marker='.', label='Logistic Regression')
 
-    # send results to a .csv file to be used for creating a learning curve
-    newFile = open("C:/Users/caire/PycharmProjects/fyp/LearningCurveIndividualArticles2.csv", 'a+')
-    newFile.write(str(lsvm_learningCurve_accuracy))
-    newFile.write(str(knn_learningCurve_accuracy))
-    newFile.write(str(clf_learningCurve_accuracy))
-    newFile.write(str(naive_learningCurve_accuracy))
-    newFile.write(str(logReg_learningCurve_accuracy))
-    newFile.close()
+    # axis labels
+    pyplot.title('Learning curve')
+    pyplot.xlabel('Number of Training instances')
+    pyplot.ylabel('Accuracy (%)')
+    # show the legend
+    pyplot.legend()
+    pyplot.savefig('learningCurve.png', bbox_inches='tight')
+    # show the plot
+    pyplot.show()
 
     # print the confusion matrix and classification report for the algorithms
     print_confusion_matrix_and_report("KNN", test, knn_test_predictions)

@@ -1,122 +1,79 @@
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import LinearSVC
+from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 import pandas as pd
-from sklearn import tree, metrics
+from sklearn import tree
 from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
 from matplotlib import pyplot
 
-feature_names = ['/title', '/script', '/style', '/noscript', '/div', '/head', '/a', '/li', '/ul', '/nav', '/i', '/span',
-                 '/h1', '/h2', '/ins', '/aside', '/section', '/label', '/form', '/header', '/p', '/strong', '/b', '/h3',
-                 '/em', '/h4', '/button', '/article', '/cite', '/blockquote', '/hr', '/h5', '/footer', '/body', '/html',
-                 '/iframe', '/sup', '/u', '/ol', '/sub', '/bo', '/ht', '/s', '/td', '/tr', '/tbody', '/table', '/small',
-                 '/textarea', '/figcaption', '/figure', '/scri', '/xscript', '/del', '/dt', '/dl', '/option', '/select',
-                 '/dir', '/time', '/center', '/fieldset', '/g', '/embed', '/object', '/picture', '/video', '/q', '/h6',
-                 '/canvas', '/main', '/audio', '/code', '/big', '/th', '/thead', '/pre', '/path', '/rect', '/svg',
-                 '/defs', '/symbol', '/use', '/hgroup', '/noembed', '/circle', '/fb', '/scr', '/caption', '/legend',
-                 '/font', '/esi', '/img', '/map', '/link', '/opta', '/DataObject', '/PageMap', '/scriptblock', '/menu',
-                 '/su', '/var', '/wp-ad', '/polygon', '/ellipse', '/gcse', "/scr'+'ipt", '/dd', '/dli', '/interaction',
-                 '/headline', '/source', '/teasetext', '/byline', '/date', '/input', '/filter', '/meta',
-                 '/bb-experience-select', '/bb-ad', '/bb-social', '/bb-quick-links', '/bb-search-suggestions',
-                 '/address', '/br', '/summary', '/details', '/SCRIPT', '/A', '/Story', '/nobr', '/P', '/NOSCRIPT',
-                 '/DIV', "/sc'+'ript", '/desc', '/notag', '/clipPath', '/abbr', '/followus', '/social', '/logo',
-                 '/terms', '/acronym', '/template', '/sly', '/colgroup', '/amp-ad', '/Attribute', '/mask', '/o',
-                 '/CENTER', '/IFRAME', '/exsi', '/sc', '/polyline', '/progress', '/tspan', '/text', '/tfoot', '/mark',
-                 '/noframes', '/placeholder', '/HTML', '/interstitial', '/ad', '/amp-img', '/fbs-accordion', '/fbs-ad',
-                 '/router-outlet', '/navbar', '/channel-path', '/metrics', '/article-header', '/sharing',
-                 '/contrib-block', '/sig-file', '/article-body-container', '/printbar', '/medianet', '/speed-bump',
-                 '/page', '/stream', '/sidenav', '/app', '/app-root', '/LI', '/H2', '/line', '/EMBED', '/OBJECT',
-                 '/ad-wx-ws', '/ad-mw-position-1', '/site-notice', '/header-user-settings', '/header-menu-mobile',
-                 '/header-menu-desktop', '/search-autocomplete', '/header-search-box', '/header-user-login',
-                 '/header-component', '/favorites-bar', '/favorites-more', '/favorites', '/cat-six-title',
-                 '/cat-six-article-scripts', '/cat-six-disclaimer', '/cat-six-about-author', '/cat-six-article-detail',
-                 '/ad-wx-mid-leader', '/ad-mw-position-3', '/cat-six-article', '/cat-six-recent-articles', '/disqus',
-                 '/ad-wx-bottom-leader', '/ad-mw-position-2', '/footer-component', '/cat-six-layout', '/cat-six',
-                 '/rdf', '/include', '/amp-analytics', '/amp-timeago', '/amp-list', '/amp-social-share',
-                 '/amp-facebook-like', '/amp-accordion', '/amp-lightbox', '/amp-install-serviceworker', '/submit',
-                 "/bo'+'dy", "/ht'+'ml", '/lh', '/contentPath', '/content', '/span/', '/amp-youtube', '/H3', '/heading',
-                 '/search', '/SPAN', '/xml', '/w', '/m', '/mce', '/feMergeNode', '/feMerge', '/strike', '/rc-container',
-                 '/HEAD', '/TABLE', '/TD', '/TR', '/FORM', '/B', '/feFuncA', '/feComponentTransfer', '/clippath', '/h7',
-                 '/pagination-nav', '/linearGradient', '/stop', '/wis-scorestrip', '/path/to/file', '/path/to/ept/file',
-                 '/path/to/regional/file', '/path/to/css', '/amp-twitter', '/amp-iframe', '/gpt-sizeset', '/gpt-ad',
-                 '/amp-sticky-ad', '/amp-image-lightbox', '/amp-pixel', '/amp-video', '/eM', '/href', '/csg-modal',
-                 '/h9', '/h8', '/broadstreet-zone', '/red', '/post', '/amp-embed', '/amp-carousel', '/BLOCKQUOTE',
-                 '/EM', '/Center', '/h4but', '/h', '/xxx', '/scr+ipt', '/wbr', '/asset-code', "/'+'div", '/hp', '/tt',
-                 '/cnt', '/image', '/asset_inline', "/scri'+'pt", '/I', '/ll', '/pullquote', '/scrip', '/customspan']
 
-df = pd.read_csv(
-    'C:/Users/caire/OneDrive/Documents/forth yr semester 1/Final Year Project/HTMLTagsIndividualArticlesNormalized.csv',
-    header=0, delimiter=",")
+def main():
+    # read in the data and shuffle
+    df = pd.read_csv('C:/Users/caire/OneDrive/Documents/forth yr semester 1/Final Year '
+                     'Project/HTMLTagsIndividualArticlesNormalizedMinMax.csv', header=0, delimiter=",")
+    df = df.sample(frac=1)
 
-labels = df["Reliability"]
-data_before_feature_sel = df.values[:, :305]
-cor = df.corr(method='pearson')
-cor_target = abs(cor["Reliability"])
-relevant_features = cor_target[cor_target > 0.35]
-print(relevant_features)
-data = df[[relevant_features.index[0], relevant_features.index[1], relevant_features.index[2],
-           relevant_features.index[3], relevant_features.index[4], 'Reliability']]
+    # find the attributes with the highest correlation to the class
+    cor = df.corr(method='pearson')
+    cor_target = abs(cor["Reliability"])
+    relevant_features = cor_target[cor_target > 0.3]
+    print(relevant_features)
+    data = df[[relevant_features.index[0], relevant_features.index[1], relevant_features.index[2],
+               relevant_features.index[3], relevant_features.index[4], 'Reliability']]
 
-data = data.sample(frac=1)
-train_split = int((len(data) * 2) / 3)
-training = data.values[0:train_split]
-test = data.values[train_split - 1:]
+    # split the data into training and test data
+    train_split = int((len(data) * 2) / 3)
+    training = data.values[0:train_split]
+    test = data.values[train_split - 1:]
 
-# fit all models to the data and make predictions
-knn = KNeighborsClassifier(n_neighbors=11)
-knn.fit(training[:, :4], training[:, 5])
-knn_test_predictions = knn.predict_proba(test[:, :4])
+    # fit all models to the data and make predictions
+    knn = KNeighborsClassifier(n_neighbors=11)
+    lsvm = SVC(kernel="linear", probability=True)
+    clf = tree.DecisionTreeClassifier()
+    naive = GaussianNB()
+    logReg = LogisticRegression()
 
-lsvm = SVC(kernel="linear", probability=True)
-lsvm.fit(training[:, :4], training[:, 5])
-lsvm_test_predictions = lsvm.predict_proba(test[:, :4])
+    # calculate roc curves
+    knn_fpr, knn_tpr, _ = roc_curve(test[:, 5], generate_ROC_curve_data(knn, "KNN", training, test))
+    lsvm_fpr, lsvm_tpr, _ = roc_curve(test[:, 5], generate_ROC_curve_data(lsvm, "LSVM", training, test))
+    clf_fpr, clf_tpr, _ = roc_curve(test[:, 5], generate_ROC_curve_data(clf, "CART", training, test))
+    naive_fpr, naive_tpr, _ = roc_curve(test[:, 5], generate_ROC_curve_data(naive, "Naive Bayes", training, test))
+    log_fpr, log_tpr, _ = roc_curve(test[:, 5], generate_ROC_curve_data(logReg, "Logistic Regression", training, test))
 
-clf = tree.DecisionTreeClassifier()
-clf.fit(training[:, :4], training[:, 5])
-clf_test_predictions = clf.predict_proba(test[:, :4])
+    # plot the roc curve for the model
+    pyplot.plot(knn_fpr, knn_tpr, marker='.', label='KNN')
+    pyplot.plot(lsvm_fpr, lsvm_tpr, marker='.', label='LSVM')
+    pyplot.plot(clf_fpr, clf_tpr, marker='.', label='CART')
+    pyplot.plot(naive_fpr, naive_tpr, marker='.', label='Naive Bayes')
+    pyplot.plot(log_fpr, log_tpr, marker='.', label='Logistic Regression')
 
-naive = GaussianNB()
-naive.fit(training[:, :4], training[:, 5])
-naive_test_predictions = naive.predict_proba(test[:, :4])
+    # axis labels
+    pyplot.title('ROC curve')
+    pyplot.xlabel('False Positive Rate')
+    pyplot.ylabel('True Positive Rate')
+    # show the legend
+    pyplot.legend()
+    pyplot.savefig('ROCcurve.png', bbox_inches='tight')
+    # show the plot
+    pyplot.show()
 
-# keep probabilities for the positive outcome only
-knn_test_predictions = knn_test_predictions[:, 1]
-lsvm_test_predictions = lsvm_test_predictions[:, 1]
-clf_test_predictions = clf_test_predictions[:, 1]
-naive_test_predictions = naive_test_predictions[:, 1]
 
-# calculate ROC AUC scores
-knn_auc = roc_auc_score(test[:, 5], knn_test_predictions)
-lsvm_auc = roc_auc_score(test[:, 5], lsvm_test_predictions)
-clf_auc = roc_auc_score(test[:, 5], clf_test_predictions)
-naive_auc = roc_auc_score(test[:, 5], naive_test_predictions)
+def generate_ROC_curve_data(algorithm, algorithmName, training, test):
+    # fit the model and make predictions
+    algorithm.fit(training[:, :4], training[:, 5])
+    algorithm_test_predictions = algorithm.predict_proba(test[:, :4])
 
-# summarize scores
-print('KNN: ROC AUC=%.3f' % (knn_auc))
-print('LSVM: ROC AUC=%.3f' % (lsvm_auc))
-print('CART: ROC AUC=%.3f' % (clf_auc))
-print('Naive: ROC AUC=%.3f' % (naive_auc))
+    # keep probabilities for the positive outcome only
+    algorithm_test_predictions = algorithm_test_predictions[:, 1]
 
-# calculate roc curves
-knn_fpr, knn_tpr, _ = roc_curve(test[:, 5], knn_test_predictions)
-lsvm_fpr, lsvm_tpr, _ = roc_curve(test[:, 5], lsvm_test_predictions)
-clf_fpr, clf_tpr, _ = roc_curve(test[:, 5], clf_test_predictions)
-naive_fpr, naive_tpr, _ = roc_curve(test[:, 5], naive_test_predictions)
+    # calculate and print the ROC AUC scores
+    algorithm_auc = roc_auc_score(test[:, 5], algorithm_test_predictions)
+    print(algorithmName + ': ROC AUC=%.3f' % algorithm_auc)
 
-# plot the roc curve for the model
-pyplot.plot(knn_fpr, knn_tpr, marker='.', label='KNN')
-pyplot.plot(lsvm_fpr, lsvm_tpr, marker='.', label='LSVM')
-pyplot.plot(clf_fpr, clf_tpr, marker='.', label='CART')
-pyplot.plot(naive_fpr, naive_tpr, marker='.', label='Naive')
+    # return predictions to be plotted in the curve
+    return algorithm_test_predictions
 
-# axis labels
-pyplot.title('ROC curve')
-pyplot.xlabel('False Positive Rate')
-pyplot.ylabel('True Positive Rate')
-# show the legend
-pyplot.legend()
-pyplot.savefig('ROCcurve.png', bbox_inches='tight')
-# show the plot
-pyplot.show()
+
+main()
