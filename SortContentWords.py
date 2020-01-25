@@ -5,8 +5,7 @@ import numpy as np
 
 def main():
     #  a subset of all sources for the articles in the NELA2017 dataset
-    sources1 = ["AP", "BBC", "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed", "Drudge Report", "Faking News",
-               "RedState", "The Gateway Pundit", "The Huffington Post"]
+    sources1 = ["The Huffington Post"]
 
     # # second subset sources used to determine if the results so far are dependent on the current sources being used
     # sources2 = ["CNN", "MotherJones", "NPR", "PBS", "The Hill", "Vox", "Addicting Info", "New York Daily News", "Prntly",
@@ -30,9 +29,12 @@ def main():
         with open("C:/Users/caire/Desktop/OutputData/OutputWordsArticlesSorted/" + s + ".txt") as file:
             print("adding article info for " + s)
             for cnt, line in enumerate(file):
-                line = line.replace("Counter(", "").replace(")", "")
-                lineDict = eval(line)
-                listOfDictionaryValues.append(str(list(lineDict.values())) + s)
+                if cnt > 2000:
+                    line = line.replace("Counter(", "").replace(")", "")
+                    lineDict = eval(line)
+                    listOfDictionaryValues.append(str(list(lineDict.values())) + s)
+                    print(cnt)
+
     listForExcel = np.hstack(listOfDictionaryValues)
     np.savetxt("C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/outputWordCountForExcelArticles.csv", listForExcel,
                delimiter="\n", fmt='%s')
