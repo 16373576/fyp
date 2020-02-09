@@ -33,7 +33,7 @@ englishStopWords = set(stopwords.words('english'))
 symbolStopwords = (
     {":", ";", "'", '"', '”', '“', ",", ".", "-", "_", "?", "$", "&", '...', '.', '�', '!', "''", "``", "%", "@", "--",
      ")", "(", "[", "]", "[]", "[ ]", "’", "|", "‘", " ", "'s", 'mr', 'mrs', 'one', 'two', 'said', 'hi', 'say', "n't",
-     '—', 'the', 'mr.', 'mrs.', 'get', 'us', ' #', 'jr.', '–', 'i.r.', '■', 'ms.', '__'})
+     '—', 'the', 'mr.', 'mrs.', 'get', 'us', ' #', 'jr.', '–', 'i.r.', '■', 'ms.', '__', ''})
 stopwords = englishStopWords.union(symbolStopwords)
 
 #  listdir() returns a list containing the names of the entries in the directory path given

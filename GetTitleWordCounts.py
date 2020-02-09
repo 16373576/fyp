@@ -1,6 +1,8 @@
 import json
 import os
 from collections import Counter
+
+from nltk import LancasterStemmer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
@@ -11,21 +13,24 @@ articleData = []
 wordCount = {}
 tokenTitle = []
 summaryAllArticles = {}
+stem = LancasterStemmer()
 
 
 #  a subset of all sources for the articles in the NELA2017 dataset
-# sources = ["AP", "BBC", "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed", "Drudge Report", "Faking News", "RedState",
-#            "The Gateway Pundit", "The Huffington Post"]
+sources = ["AP", "BBC", "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed", "Drudge Report", "Faking News", "RedState",
+           "The Gateway Pundit", "The Huffington Post"]
 
 # second subset sources used to determine if the results so far are dependent on the current sources being used
-sources = ["CNN", "MotherJones", "NPR", "PBS", "The Hill", "Vox", "Addicting Info", "New York Daily News", "Prntly",
-           "The D.C. Clothesline", "The Duran", "Yahoo News"]
+# sources = ["CNN", "MotherJones", "NPR", "PBS", "The Hill", "Vox", "Addicting Info", "New York Daily News", "Prntly",
+#            "The D.C. Clothesline", "The Duran", "Yahoo News"]
 
 #  set of commonly used words such as "the", "a", "in" etc.
 englishStopWords = set(stopwords.words('english'))
-stopwords = englishStopWords.union(
+symbolStopwords = (
     {":", ";", "'", '"', '”', '“', ",", ".", "-", "_", "?", "$", "&", '...', '.', '�', '!', "''", "``", "%", "@", "--",
-     ")", "(", "[", "]", "[]", "[ ]", "’", "|", "‘", " "})
+     ")", "(", "[", "]", "[]", "[ ]", "’", "|", "‘", " ", "'s", 'mr', 'mrs', 'one', 'two', 'said', 'hi', 'say', "n't",
+     '—', 'the', 'mr.', 'mrs.', 'get', 'us', ' #', 'jr.', '–', 'i.r.', '■', 'ms.', '__', ''})
+stopwords = englishStopWords.union(symbolStopwords)
 
 #  listdir() returns a list containing the names of the entries in the directory path given
 # ['1_April', '2_May', '3_June', '4_July', '5_August', '6_September', '7_October'] is returned from NELA2017
@@ -50,7 +55,7 @@ for m in month_directories:  # go through all items in month_directories and get
 for s in sources:
     # clear the html data for each source
     summaryAllArticles.clear()
-    if not os.path.isfile("C:/Users/caire/Desktop/OutputData/OutputTitleArticles2/" + s + ".txt"):
+    if not os.path.isfile("C:/Users/caire/Desktop/OutputData/OutputTitleArticles/" + s + ".txt"):
         for p in articles_path:
             for d in p.date:
                 fileFound = True
@@ -80,16 +85,27 @@ for s in sources:
 
                                     # add word from the tokenized data to create a list of all words for that article
                                     for word in tokenTitle:
-                                        if word not in stopwords:
-                                            if word not in wordCount:
-                                                wordCount[word] = 1
-                                            else:
-                                                wordCount[word] += 1
+                                        # convert all words to lower case to avoid duplicates
+                                        word = word.lower()
+                                        #  remove the symbol stopwords
+                                        for char in word:
+                                            if char in symbolStopwords:
+                                                word = word.replace(char, "")
+                                        # check if the word contains a number or is a stopword
+                                        if not any(char.isdigit() for char in word):
+                                            if word not in stopwords:
+                                                # stem words to avoid duplication by pluralization
+                                                word = stem.stem(word)
+                                                # if word isn't already in the dict add it
+                                                if word not in wordCount:
+                                                    wordCount[word] = 1
+                                                else:  # else increase the value of that key in the dict
+                                                    wordCount[word] += 1
 
                                 except ValueError:
                                     print("JsonDecodeError for file " + articleTitle)
                         if len(wordCount) != 0:
-                            with open("C:/Users/caire/Desktop/OutputData/OutputTitleArticles2/" + s + ".txt", 'a', encoding='utf-8') as newFile:
+                            with open("C:/Users/caire/Desktop/OutputData/OutputTitleArticles/" + s + ".txt", 'a', encoding='utf-8') as newFile:
                                 newFile.write(str(Counter(wordCount)) + "\n")
                         wordCount.clear()
     print(s + "'s title words counted for each article and added to file")

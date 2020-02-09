@@ -52,7 +52,7 @@ def main():
 
     # read in the data from the .csv file and shuffle
     df = pd.read_csv(
-        'C:/Users/caire/OneDrive/Documents/forth yr semester 1/Final Year Project/HTMLTagsArticlesCombinedNormalized.csv',
+        "C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/HTMLTagsNormalizedCombined.csv",
         header=0, delimiter=",")
     df = df.sample(frac=1)
 
@@ -97,7 +97,7 @@ def cross_validation_test(algorithm, algorithm_name, data, results):
 def feature_selection(dataframe):
     cor = dataframe.corr(method='pearson')
     cor_target = abs(cor["Reliability"])
-    relevant_features = cor_target[cor_target > 0.3]
+    relevant_features = cor_target[cor_target > 0.2826]
     print(relevant_features)
     data = dataframe[[relevant_features.index[0], relevant_features.index[1], relevant_features.index[2],
                       relevant_features.index[3], relevant_features.index[4]]]

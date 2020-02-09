@@ -8,9 +8,15 @@ def main():
     # sources = ["AP", "BBC", "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed", "Drudge Report", "Faking News",
     #            "RedState", "The Gateway Pundit", "The Huffington Post"]
 
-    # second subset sources used to determine if the results so far are dependent on the current sources being used
-    sources = ["CNN", "MotherJones", "NPR", "PBS", "The Hill", "Vox", "Addicting Info", "New York Daily News", "Prntly",
-               "The D.C. Clothesline", "The Duran", "Yahoo News"]
+    # # second subset sources used to determine if the results so far are dependent on the current sources being used
+    # sources = ["CNN", "MotherJones", "NPR", "PBS", "The Hill", "Vox", "Addicting Info", "New York Daily News", "Prntly",
+    #            "The D.C. Clothesline", "The Duran", "Yahoo News"]
+
+    # third subset sources used to determine if the results so far are dependent on the current sources being used
+    sources = ["Business Insider", "CNBC", "Daily Buzz Live", "The Atlantic", "The Fiscal Times", "The Guardian",
+               "Xinhua",
+               "Activist Post", "Bipartisan Report", "Breitbart", "Fox News", "Intellihub", "The Spoof",
+               "Washington Examiner"]
 
     # initialize variables
     lineDict = {}
@@ -27,13 +33,13 @@ def main():
     # create a numpy array to send to csv file
     listOfDictionaryValues.append(str(list(listOfTags)))
     for s in sources:
-        with open("C:/Users/caire/Desktop/OutputData/OutputHtmlArticlesSorted2/" + s + ".txt") as file:
+        with open("C:/Users/caire/Desktop/OutputData/OutputHtmlArticlesSorted3/" + s + ".txt") as file:
             for cnt, line in enumerate(file):
                 line = line.replace("Counter(", "").replace(")", "")
                 lineDict = eval(line)
                 listOfDictionaryValues.append(str(list(lineDict.values())) + s)
     listForExcel = np.hstack(listOfDictionaryValues)
-    np.savetxt("C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/outputTagCountForExcelArticles2.csv", listForExcel,
+    np.savetxt("C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/outputTagCountForExcelArticles3.csv", listForExcel,
                delimiter="\n", fmt='%s')
 
 
@@ -58,11 +64,11 @@ def get_list_of_all_tags():
 
 def sort_tags(list_of_tags, sources):
     for s in sources:
-        if not os.path.isfile("C:/Users/caire/Desktop/OutputData/OutputHtmlArticlesSorted2/" + s + ".txt"):
+        if not os.path.isfile("C:/Users/caire/Desktop/OutputData/OutputHtmlArticlesSorted3/" + s + ".txt"):
             dictKey = {}
             sortedArticles = []
             print(s)
-            with open("C:/Users/caire/Desktop/OutputData/OutputHtmlArticles2/" + s + ".txt") as file:
+            with open("C:/Users/caire/Desktop/OutputData/OutputHtmlArticles3/" + s + ".txt") as file:
                 for cnt, line in enumerate(file):
                     line = line.replace("Counter(", "").replace(")", "")
                     print("Line {}: {}".format(cnt, line))
@@ -82,7 +88,7 @@ def sort_tags(list_of_tags, sources):
                     for tag in list_of_tags:
                         getDictValues = {tag: lineDict[tag]}
                         sortedDict.update(getDictValues)
-                    with open("C:/Users/caire/Desktop/OutputData/OutputHtmlArticlesSorted2/" + s + ".txt", 'a') as newFile:
+                    with open("C:/Users/caire/Desktop/OutputData/OutputHtmlArticlesSorted3/" + s + ".txt", 'a') as newFile:
                         newFile.write(str(sortedDict) + "\n")
 
 

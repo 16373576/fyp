@@ -10,14 +10,14 @@ from matplotlib import pyplot
 
 def main():
     # read in the .csv file and shuffle
-    df = pd.read_csv('C:/Users/caire/OneDrive/Documents/forth yr semester 1/Final Year Project/HTMLTagsIndividualArticles2Normalized.csv',
+    df = pd.read_csv("C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/HTMLTagsNormalizedCombined.csv",
                      header=0, delimiter=",")
     df = df.sample(frac=1)
 
     # find the attributes with the highest correlation to the class
     cor = df.corr(method='pearson')
     cor_target = abs(cor["Reliability"])
-    relevant_features = cor_target[cor_target > 0.3]
+    relevant_features = cor_target[cor_target > 0.2826]
     print(relevant_features)
     data = df[[relevant_features.index[0], relevant_features.index[1], relevant_features.index[2],
                relevant_features.index[3], relevant_features.index[4], 'Reliability']]

@@ -5,7 +5,8 @@ import numpy as np
 
 def main():
     #  a subset of all sources for the articles in the NELA2017 dataset
-    sources1 = ["The Huffington Post"]
+    sources1 = ["AP", "BBC"]#, "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed", "Drudge Report", "Faking News",
+               # "RedState", "The Gateway Pundit", "The Huffington Post"]
 
     # # second subset sources used to determine if the results so far are dependent on the current sources being used
     # sources2 = ["CNN", "MotherJones", "NPR", "PBS", "The Hill", "Vox", "Addicting Info", "New York Daily News", "Prntly",
@@ -26,17 +27,16 @@ def main():
     # create a numpy array to send to csv file
     listOfDictionaryValues.append(str(list(listOfTags)))
     for s in sources1:
-        with open("C:/Users/caire/Desktop/OutputData/OutputWordsArticlesSorted/" + s + ".txt") as file:
+        with open("C:/Users/caire/Desktop/OutputData/OutputTitleArticlesSorted/" + s + ".txt") as file:
             print("adding article info for " + s)
             for cnt, line in enumerate(file):
-                if cnt > 2000:
-                    line = line.replace("Counter(", "").replace(")", "")
-                    lineDict = eval(line)
-                    listOfDictionaryValues.append(str(list(lineDict.values())) + s)
-                    print(cnt)
+                line = line.replace("Counter(", "").replace(")", "")
+                lineDict = eval(line)
+                listOfDictionaryValues.append(str(list(lineDict.values())) + s)
+                print(cnt)
 
     listForExcel = np.hstack(listOfDictionaryValues)
-    np.savetxt("C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/outputWordCountForExcelArticles.csv", listForExcel,
+    np.savetxt("C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/outputTitleCountForExcelArticles.csv", listForExcel,
                delimiter="\n", fmt='%s')
 
 
@@ -45,9 +45,11 @@ def get_list_of_all_words(sources1):
 
     # get a list of all tags
     for s1 in sources1:
-        with open("C:/Users/caire/Desktop/OutputData/OutputWordsArticles/" + s1 + ".txt", 'r', encoding='latin1') as file:
+        with open("C:/Users/caire/Desktop/OutputData/OutputTitleArticles/" + s1 + ".txt", 'r',
+                  encoding='latin1') as file:
             print(s1 + " adding words to list")
             for cnt, line in enumerate(file):
+                line = line.replace("Counter(", "").replace(")", "")
                 lineDict1 = eval(line)
                 for word1 in lineDict1.keys():
                     if word1 not in listOfAllWords:
@@ -58,11 +60,12 @@ def get_list_of_all_words(sources1):
 
 def sort_words(list_of_words, sources):
     for s in sources:
-        if not os.path.isfile("C:/Users/caire/Desktop/OutputData/OutputWordsArticlesSorted/" + s + ".txt"):
+        if not os.path.isfile("C:/Users/caire/Desktop/OutputData/OutputTitleArticlesSorted/" + s + ".txt"):
             dictKey = {}
             sortedArticles = []
             print(s + " sorted")
-            with open("C:/Users/caire/Desktop/OutputData/OutputWordsArticles/" + s + ".txt", 'r', encoding='utf-8') as file:
+            with open("C:/Users/caire/Desktop/OutputData/OutputTitleArticles/" + s + ".txt", 'r',
+                      encoding='utf-8') as file:
                 for cnt, line in enumerate(file):
                     line = line.replace("Counter(", "").replace(")", "")
                     if not line:
@@ -81,7 +84,8 @@ def sort_words(list_of_words, sources):
                     for tag in list_of_words:
                         getDictValues = {tag: lineDict[tag]}
                         sortedDict.update(getDictValues)
-                    with open("C:/Users/caire/Desktop/OutputData/OutputWordsArticlesSorted/" + s + ".txt", 'a') as newFile:
+                    with open("C:/Users/caire/Desktop/OutputData/OutputTitleArticlesSorted/" + s + ".txt",
+                              'a') as newFile:
                         newFile.write(str(sortedDict) + "\n")
 
 
