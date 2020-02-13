@@ -10,17 +10,19 @@ from matplotlib import pyplot
 
 def main():
     # read in the .csv file and shuffle
-    df = pd.read_csv("C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/HTMLTagsNormalizedCombined.csv",
+    df = pd.read_csv("C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/outputContentAnalysis.csv",
                      header=0, delimiter=",")
     df = df.sample(frac=1)
 
-    # find the attributes with the highest correlation to the class
-    cor = df.corr(method='pearson')
-    cor_target = abs(cor["Reliability"])
-    relevant_features = cor_target[cor_target > 0.2826]
-    print(relevant_features)
-    data = df[[relevant_features.index[0], relevant_features.index[1], relevant_features.index[2],
-               relevant_features.index[3], relevant_features.index[4], 'Reliability']]
+    # # find the attributes with the highest correlation to the class
+    # cor = df.corr(method='pearson')
+    # cor_target = abs(cor["Reliability"])
+    # relevant_features = cor_target[cor_target > 0.2826]
+    # print(relevant_features)
+    # data = df[[relevant_features.index[0], relevant_features.index[1], relevant_features.index[2],
+    #            relevant_features.index[3], relevant_features.index[4], 'Reliability']]
+
+    data = df[["Article wc", "Title wc", "Article Sentiment", "Article Sentiment", "Reliability"]]
 
     # split into training and test datasets
     train_split = int((len(data) * 2) / 3)
@@ -43,28 +45,38 @@ def main():
         print(instances)
         instance.append(instances)
         knn = KNeighborsClassifier(n_neighbors=11)
-        knn.fit(training[0:instances, :4], training[0:instances, 5])
-        knn_test_predictions = knn.predict(test[:, :4])
+        # knn.fit(training[0:instances, :4], training[0:instances, 5])
+        # knn_test_predictions = knn.predict(test[:, :4])
+        knn.fit(training[0:instances, :3], training[0:instances, 4])
+        knn_test_predictions = knn.predict(test[:, :3])
         knn_learningCurve_accuracy.append((metrics.accuracy_score(test[:, -1], knn_test_predictions)) * 100)
 
         lsvm = LinearSVC()
-        lsvm.fit(training[0:instances, :4], training[0:instances, 5])
-        lsvm_test_predictions = lsvm.predict(test[:, :4])
+        # lsvm.fit(training[0:instances, :4], training[0:instances, 5])
+        # lsvm_test_predictions = lsvm.predict(test[:, :4])
+        lsvm.fit(training[0:instances, :3], training[0:instances, 4])
+        lsvm_test_predictions = lsvm.predict(test[:, :3])
         lsvm_learningCurve_accuracy.append((metrics.accuracy_score(test[:, -1], lsvm_test_predictions)) * 100)
 
         clf = tree.DecisionTreeClassifier()
-        clf.fit(training[0:instances, :4], training[0:instances, 5])
-        clf_test_predictions = clf.predict(test[:, :4])
+        # clf.fit(training[0:instances, :4], training[0:instances, 5])
+        # clf_test_predictions = clf.predict(test[:, :4])
+        clf.fit(training[0:instances, :3], training[0:instances, 4])
+        clf_test_predictions = clf.predict(test[:, :3])
         clf_learningCurve_accuracy.append((metrics.accuracy_score(test[:, -1], clf_test_predictions)) * 100)
 
         naive = GaussianNB()
-        naive.fit(training[0:instances, :4], training[0:instances, 5])
-        naive_test_predictions = naive.predict(test[:, :4])
+        # naive.fit(training[0:instances, :4], training[0:instances, 5])
+        # naive_test_predictions = naive.predict(test[:, :4])
+        naive.fit(training[0:instances, :3], training[0:instances, 4])
+        naive_test_predictions = naive.predict(test[:, :3])
         naive_learningCurve_accuracy.append((metrics.accuracy_score(test[:, -1], naive_test_predictions)) * 100)
 
         logReg = LogisticRegression()
-        logReg.fit(training[0:instances, :4], training[0:instances, 5])
-        logReg_test_predictions = logReg.predict(test[:, :4])
+        # logReg.fit(training[0:instances, :4], training[0:instances, 5])
+        # logReg_test_predictions = logReg.predict(test[:, :4])
+        logReg.fit(training[0:instances, :3], training[0:instances, 4])
+        logReg_test_predictions = logReg.predict(test[:, :3])
         logReg_learningCurve_accuracy.append((metrics.accuracy_score(test[:, -1], logReg_test_predictions)) * 100)
 
     # plot the roc curve for the model

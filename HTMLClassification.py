@@ -52,15 +52,16 @@ def main():
 
     # read in the data from the .csv file and shuffle
     df = pd.read_csv(
-        "C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/HTMLTagsNormalizedCombined.csv",
-        header=0, delimiter=",")
+        "C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/outputContentAnalysis.csv",
+        header=0, delimiter=",") # , error_bad_lines=False
     df = df.sample(frac=1)
 
     # assign the labels as the Reliability column
     labels = df["Reliability"]
 
     # conduct feature selection so the algorithms will run faster as now only the 5 most related attributes are used
-    data = feature_selection(df)
+    #data = feature_selection(df)
+    data = df[["Article wc", "Title wc", "Article Sentiment", "Article Sentiment"]]
 
     # initialise the algorithms and fit to the data
     knn = KNeighborsClassifier(n_neighbors=11)
@@ -79,11 +80,11 @@ def main():
     cross_validation_test(naive, "Naive Bayes Model", data, labels)
     cross_validation_test(logReg, "logistic regression", data, labels)
 
-    # print out the sklearn decision tree
-    dtree = dtreeplt(model=clf, feature_names=feature_names, target_names=["reliable", "unreliable"])
-    fig = dtree.view()
-    # fig.savefig('DecisionTree.png')
-    fig.savefig('ArticleDecisionTree.png')
+    # # print out the sklearn decision tree
+    # dtree = dtreeplt(model=clf, feature_names=feature_names, target_names=["reliable", "unreliable"])
+    # fig = dtree.view()
+    # # fig.savefig('DecisionTree.png')
+    # fig.savefig('ArticleDecisionTree.png')
 
 
 # checks the results of the algorithms using 10-fold cross-validation and prints out the results

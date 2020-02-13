@@ -1,5 +1,8 @@
 import json
 import os
+
+import numpy as np
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from collections import Counter
 
 from nltk import LancasterStemmer
@@ -7,18 +10,18 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
 # define variables
+analyzer = SentimentIntensityAnalyzer()
+dictKeys = []
+stringArticle = ""
 articles_path = []
-articleTitles = []
-articleData = []
-wordCount = {}
-tokenTitle = []
-summaryAllArticles = {}
 stem = LancasterStemmer()
-
+articleWords = []
+tokenTitle = []
+articleData = []
 
 #  a subset of all sources for the articles in the NELA2017 dataset
-sources = ["AP", "BBC", "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed", "Drudge Report", "Faking News", "RedState",
-           "The Gateway Pundit", "The Huffington Post"]
+sources = ["AP", "BBC", "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed", "Drudge Report", "Faking News",
+           "RedState", "The Gateway Pundit", "The Huffington Post"]
 
 # second subset sources used to determine if the results so far are dependent on the current sources being used
 # sources = ["CNN", "MotherJones", "NPR", "PBS", "The Hill", "Vox", "Addicting Info", "New York Daily News", "Prntly",
@@ -27,8 +30,10 @@ sources = ["AP", "BBC", "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed
 #  set of commonly used words such as "the", "a", "in" etc.
 englishStopWords = set(stopwords.words('english'))
 symbolStopwords = (
-    {":", ";", "'", '"', '”', '“', ",", ".", "-", "_", "?", "$", "&", '...', '.', '�', '!', "''", "``", "%", "@", "--",
-     ")", "(", "[", "]", "[]", "[ ]", "’", "|", "‘", " ", "'s", 'mr', 'mrs', 'one', 'two', 'said', 'hi', 'say', "n't",
+    {":", ";", "'", '"', '”', '“', ",", ".", "-", "_", "?", "$", "&", '...', '.', '�', '!', "''", "``", "%", "@",
+     "--",
+     ")", "(", "[", "]", "[]", "[ ]", "’", "|", "‘", " ", "'s", 'mr', 'mrs', 'one', 'two', 'said', 'hi', 'say',
+     "n't",
      '—', 'the', 'mr.', 'mrs.', 'get', 'us', ' #', 'jr.', '–', 'i.r.', '■', 'ms.', '__', ''})
 stopwords = englishStopWords.union(symbolStopwords)
 
@@ -51,11 +56,9 @@ for m in month_directories:  # go through all items in month_directories and get
     directoryPath = Directories(m, date_directories)
     articles_path.append(directoryPath)
 
-#  the path to the files with the HTML is C:/NELA2017/NELA2017.tar/NELA2017/"month"/"date"/"source"/"article_title.txt"
 for s in sources:
-    # clear the html data for each source
-    summaryAllArticles.clear()
-    if not os.path.isfile("C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputTitleArticles/" + s + ".txt"):
+    if not os.path.isfile(
+            "C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputTitleSentiment/" + s + ".txt"):
         for p in articles_path:
             for d in p.date:
                 fileFound = True
@@ -83,7 +86,6 @@ for s in sources:
                                     # save content of the json file
                                     tokenTitle = word_tokenize(articleData['title'])
 
-                                    # add word from the tokenized data to create a list of all words for that article
                                     for word in tokenTitle:
                                         # convert all words to lower case to avoid duplicates
                                         word = word.lower()
@@ -96,15 +98,18 @@ for s in sources:
                                             if word not in stopwords:
                                                 # stem words to avoid duplication by pluralization
                                                 word = stem.stem(word)
-                                                # if word isn't already in the dict add it
-                                                if word not in wordCount:
-                                                    wordCount[word] = 1
-                                                else:  # else increase the value of that key in the dict
-                                                    wordCount[word] += 1
-
+                                                articleWords.append(word)
                                 except ValueError:
                                     print("JsonDecodeError for file " + articleTitle)
-                        with open("C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputTitleArticles/" + s + ".txt", 'a', encoding='utf-8') as newFile:
-                            newFile.write(str(dict(Counter(wordCount).most_common(10))) + "\n")
-                        wordCount.clear()
-    print(s + "'s title words counted for each article and added to file")
+                        for i in range(len(articleWords)):
+                            if not stringArticle:
+                                stringArticle = articleWords[i]
+                            else:
+                                stringArticle = stringArticle + " " + articleWords[i]
+                        scores = analyzer.polarity_scores(stringArticle)
+                        with open(
+                                "C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputTitleSentiment/" + s + ".txt",
+                                'a', encoding='utf-8') as newFile:
+                            newFile.write(str(scores.get("pos")) + ", " + str(scores.get("neu")) + ", " + str(scores.get("neg")) + ", " + str(scores.get("compound")) + "\n")
+                        stringArticle = ""
+                        articleWords.clear()

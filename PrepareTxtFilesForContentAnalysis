@@ -1,0 +1,85 @@
+import numpy as np
+
+
+def main():
+    #  a subset of all sources for the articles in the NELA2017 dataset
+    sources = ["AP", "BBC", "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed", "Drudge Report", "Faking News",
+               "RedState", "The Gateway Pundit", "The Huffington Post"]
+
+    # # second subset sources used to determine if the results so far are dependent on the current sources being used
+    # sources = ["CNN", "MotherJones", "NPR", "PBS", "The Hill", "Vox", "Addicting Info", "New York Daily News", "Prntly",
+    #            "The D.C. Clothesline", "The Duran", "Yahoo News"]
+
+    listOfArticleWordCount = getArticleWordCount(sources)
+
+    listOfTitleWordCount = getTitleWordCount(sources)
+
+    listOfArticleSentiment = getArticleSentiment(sources)
+
+    listOfTitleSentiment = getTitleSentiment(sources)
+
+    headings = ["Article wc", "Title wc", "Article Sentiment", "Title Sentiment", "Source", "Reliability"]
+
+    print(len(listOfArticleWordCount))
+    print(len(listOfTitleWordCount))
+    print(len(listOfArticleSentiment))
+    print(len(listOfTitleSentiment))
+
+    listForClassification = [headings]
+    for i in range(len(listOfArticleWordCount)):
+        articleCount = listOfArticleWordCount[i]
+        titleCount = listOfTitleWordCount[i]
+        articleSentiment = listOfArticleSentiment[i]
+        titleSentiment = listOfTitleSentiment[i]
+        contentForArticle = articleCount + "," + titleCount + "," + articleSentiment + "," + titleSentiment
+        listForClassification.append(contentForArticle)
+    listForExcel = np.hstack(listForClassification)
+    np.savetxt("C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/outputContentAnalysis.csv", listForExcel,
+               delimiter="\n", fmt='%s')
+
+
+def getArticleWordCount(sources):
+    listOfArticleWordCount = []
+    for s in sources:
+        with open("C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputWordCountArticles/" + s + ".txt") as file:
+            print("adding article word count for " + s)
+            for cnt, line in enumerate(file):
+                line = line.replace("\n", "")
+                listOfArticleWordCount.append(line)
+    return listOfArticleWordCount
+
+
+def getTitleWordCount(sources):
+    listOfTitleWordCount = []
+    for s in sources:
+        with open("C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputWordCountTitle/" + s + ".txt") as file:
+            print("adding title word count for " + s)
+            for cnt, line in enumerate(file):
+                line = line.replace("\n", "")
+                listOfTitleWordCount.append(line)
+    return listOfTitleWordCount
+
+
+def getArticleSentiment(sources):
+    listOfArticleSentiment = []
+    for s in sources:
+        with open("C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputWordSentiment/" + s + ".txt") as file:
+            print("adding article sentiments for " + s)
+            for cnt, line in enumerate(file):
+                line = line.replace("\n", "")
+                listOfArticleSentiment.append(line)
+    return listOfArticleSentiment
+
+
+def getTitleSentiment(sources):
+    listOfTitleSentiment = []
+    for s in sources:
+        with open("C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputTitleSentiment/" + s + ".txt") as file:
+            print("adding title sentiment for " + s)
+            for cnt, line in enumerate(file):
+                line = line.replace("\n", "")
+                listOfTitleSentiment.append(line + "," + s)
+    return listOfTitleSentiment
+
+
+main()

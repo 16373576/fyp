@@ -11,17 +11,19 @@ from matplotlib import pyplot
 
 def main():
     # read in the data and shuffle
-    df = pd.read_csv("C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/HTMLTagsNormalizedCombined.csv",
+    df = pd.read_csv("C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/outputContentAnalysis.csv",
                      header=0, delimiter=",")
     df = df.sample(frac=1)
 
-    # find the attributes with the highest correlation to the class
-    cor = df.corr(method='pearson')
-    cor_target = abs(cor["Reliability"])
-    relevant_features = cor_target[cor_target > 0.2826]
-    print(relevant_features)
-    data = df[[relevant_features.index[0], relevant_features.index[1], relevant_features.index[2],
-               relevant_features.index[3], relevant_features.index[4], 'Reliability']]
+    # # find the attributes with the highest correlation to the class
+    # cor = df.corr(method='pearson')
+    # cor_target = abs(cor["Reliability"])
+    # relevant_features = cor_target[cor_target > 0.2826]
+    # print(relevant_features)
+    # data = df[[relevant_features.index[0], relevant_features.index[1], relevant_features.index[2],
+    #            relevant_features.index[3], relevant_features.index[4], 'Reliability']]
+
+    data = df[["Article wc", "Title wc", "Article Sentiment", "Article Sentiment", "Reliability"]]
 
     # split the data into training and test data
     train_split = int((len(data) * 2) / 3)
@@ -36,11 +38,17 @@ def main():
     logReg = LogisticRegression()
 
     # calculate roc curves
-    knn_fpr, knn_tpr, _ = roc_curve(test[:, 5], generate_ROC_curve_data(knn, "KNN", training, test))
-    lsvm_fpr, lsvm_tpr, _ = roc_curve(test[:, 5], generate_ROC_curve_data(lsvm, "LSVM", training, test))
-    clf_fpr, clf_tpr, _ = roc_curve(test[:, 5], generate_ROC_curve_data(clf, "CART", training, test))
-    naive_fpr, naive_tpr, _ = roc_curve(test[:, 5], generate_ROC_curve_data(naive, "Naive Bayes", training, test))
-    log_fpr, log_tpr, _ = roc_curve(test[:, 5], generate_ROC_curve_data(logReg, "Logistic Regression", training, test))
+    # knn_fpr, knn_tpr, _ = roc_curve(test[:, 5], generate_ROC_curve_data(knn, "KNN", training, test))
+    # lsvm_fpr, lsvm_tpr, _ = roc_curve(test[:, 5], generate_ROC_curve_data(lsvm, "LSVM", training, test))
+    # clf_fpr, clf_tpr, _ = roc_curve(test[:, 5], generate_ROC_curve_data(clf, "CART", training, test))
+    # naive_fpr, naive_tpr, _ = roc_curve(test[:, 5], generate_ROC_curve_data(naive, "Naive Bayes", training, test))
+    # log_fpr, log_tpr, _ = roc_curve(test[:, 5], generate_ROC_curve_data(logReg, "Logistic Regression", training, test))
+
+    knn_fpr, knn_tpr, _ = roc_curve(test[:, 4], generate_ROC_curve_data(knn, "KNN", training, test))
+    lsvm_fpr, lsvm_tpr, _ = roc_curve(test[:, 4], generate_ROC_curve_data(lsvm, "LSVM", training, test))
+    clf_fpr, clf_tpr, _ = roc_curve(test[:, 4], generate_ROC_curve_data(clf, "CART", training, test))
+    naive_fpr, naive_tpr, _ = roc_curve(test[:, 4], generate_ROC_curve_data(naive, "Naive Bayes", training, test))
+    log_fpr, log_tpr, _ = roc_curve(test[:, 4], generate_ROC_curve_data(logReg, "Logistic Regression", training, test))
 
     # plot the roc curve for the model
     pyplot.plot(knn_fpr, knn_tpr, marker='.', label='KNN')
@@ -62,14 +70,18 @@ def main():
 
 def generate_ROC_curve_data(algorithm, algorithmName, training, test):
     # fit the model and make predictions
-    algorithm.fit(training[:, :4], training[:, 5])
-    algorithm_test_predictions = algorithm.predict_proba(test[:, :4])
+    # algorithm.fit(training[:, :4], training[:, 5])
+    # algorithm_test_predictions = algorithm.predict_proba(test[:, :4])
+
+    algorithm.fit(training[:, :3], training[:, 4])
+    algorithm_test_predictions = algorithm.predict_proba(test[:, :3])
 
     # keep probabilities for the positive outcome only
     algorithm_test_predictions = algorithm_test_predictions[:, 1]
 
     # calculate and print the ROC AUC scores
-    algorithm_auc = roc_auc_score(test[:, 5], algorithm_test_predictions)
+    # algorithm_auc = roc_auc_score(test[:, 5], algorithm_test_predictions)
+    algorithm_auc = roc_auc_score(test[:, 4], algorithm_test_predictions)
     print(algorithmName + ': ROC AUC=%.3f' % algorithm_auc)
 
     # return predictions to be plotted in the curve

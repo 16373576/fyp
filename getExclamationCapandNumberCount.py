@@ -2,35 +2,26 @@ import json
 import os
 from collections import Counter
 
-from nltk import LancasterStemmer
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
+from nltk import word_tokenize
+from sklearn.feature_extraction.text import CountVectorizer
+import numpy as np
 
 # define variables
 articles_path = []
 articleTitles = []
 articleData = []
-wordCount = {}
-tokenTitle = []
-summaryAllArticles = {}
-stem = LancasterStemmer()
-
+numberWordCount = 0
+exclamWordCount = 0
+capWordCount = 0
+tokenContent = []
 
 #  a subset of all sources for the articles in the NELA2017 dataset
-sources = ["AP", "BBC", "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed", "Drudge Report", "Faking News", "RedState",
-           "The Gateway Pundit", "The Huffington Post"]
+sources = ["AP", "BBC", "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed", "Drudge Report", "Faking News",
+           "RedState", "The Gateway Pundit", "The Huffington Post"]
 
 # second subset sources used to determine if the results so far are dependent on the current sources being used
 # sources = ["CNN", "MotherJones", "NPR", "PBS", "The Hill", "Vox", "Addicting Info", "New York Daily News", "Prntly",
 #            "The D.C. Clothesline", "The Duran", "Yahoo News"]
-
-#  set of commonly used words such as "the", "a", "in" etc.
-englishStopWords = set(stopwords.words('english'))
-symbolStopwords = (
-    {":", ";", "'", '"', '”', '“', ",", ".", "-", "_", "?", "$", "&", '...', '.', '�', '!', "''", "``", "%", "@", "--",
-     ")", "(", "[", "]", "[]", "[ ]", "’", "|", "‘", " ", "'s", 'mr', 'mrs', 'one', 'two', 'said', 'hi', 'say', "n't",
-     '—', 'the', 'mr.', 'mrs.', 'get', 'us', ' #', 'jr.', '–', 'i.r.', '■', 'ms.', '__', ''})
-stopwords = englishStopWords.union(symbolStopwords)
 
 #  listdir() returns a list containing the names of the entries in the directory path given
 # ['1_April', '2_May', '3_June', '4_July', '5_August', '6_September', '7_October'] is returned from NELA2017
@@ -53,9 +44,8 @@ for m in month_directories:  # go through all items in month_directories and get
 
 #  the path to the files with the HTML is C:/NELA2017/NELA2017.tar/NELA2017/"month"/"date"/"source"/"article_title.txt"
 for s in sources:
-    # clear the html data for each source
-    summaryAllArticles.clear()
-    if not os.path.isfile("C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputTitleArticles/" + s + ".txt"):
+    if not os.path.isfile(
+            "C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputCapCountTitle/" + s + ".txt"):
         for p in articles_path:
             for d in p.date:
                 fileFound = True
@@ -69,9 +59,8 @@ for s in sources:
                 if fileFound:  # if the source had articles on that date open all articles using articleTitles list
                     for articleTitle in articleTitles:
                         # empty lists for each iteration of the loop
-                        tokenTitle.clear()
+                        tokenContent.clear()
                         articleData.clear()
-
                         if articleTitle != "PaxHeader":
                             # open the file and specify mode (read, write, etc.)
                             # using the keyword "with automatically closes the file afterwards
@@ -81,30 +70,30 @@ for s in sources:
                                     articleData = json.load(file)
 
                                     # save content of the json file
-                                    tokenTitle = word_tokenize(articleData['title'])
+                                    tokenContent = word_tokenize(articleData['title'])
 
                                     # add word from the tokenized data to create a list of all words for that article
-                                    for word in tokenTitle:
-                                        # convert all words to lower case to avoid duplicates
-                                        word = word.lower()
-                                        #  remove the symbol stopwords
+                                    for word in tokenContent:
+                                        # check if any words are all in caps
+                                        if word.isupper():
+                                            capWordCount = capWordCount + 1
+                                        #  check if a word has an exclamation point
                                         for char in word:
-                                            if char in symbolStopwords:
-                                                word = word.replace(char, "")
-                                        # check if the word contains a number or is a stopword
-                                        if not any(char.isdigit() for char in word):
-                                            if word not in stopwords:
-                                                # stem words to avoid duplication by pluralization
-                                                word = stem.stem(word)
-                                                # if word isn't already in the dict add it
-                                                if word not in wordCount:
-                                                    wordCount[word] = 1
-                                                else:  # else increase the value of that key in the dict
-                                                    wordCount[word] += 1
+                                            if char == "!":
+                                                exclamWordCount = exclamWordCount + 1
+
+                                        # check if the word contains a number
+                                        if any(char.isdigit() for char in word):
+                                            numberWordCount = numberWordCount + 1
 
                                 except ValueError:
                                     print("JsonDecodeError for file " + articleTitle)
-                        with open("C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputTitleArticles/" + s + ".txt", 'a', encoding='utf-8') as newFile:
-                            newFile.write(str(dict(Counter(wordCount).most_common(10))) + "\n")
-                        wordCount.clear()
-    print(s + "'s title words counted for each article and added to file")
+                        with open(
+                                "C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputCapCountTitle/" + s + ".txt",
+                                'a', encoding='utf-8') as newFile:
+                            newFile.write(
+                                str(exclamWordCount) + ", " + str(capWordCount) + ", " + str(numberWordCount) + "\n")
+                        numberWordCount = 0
+                        capWordCount = 0
+                        exclamWordCount = 0
+    print(s + "'s number of capitalized and numeric words counted for each article and added to file")
