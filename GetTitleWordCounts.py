@@ -2,31 +2,35 @@ import json
 import os
 from collections import Counter
 
+from nltk import LancasterStemmer
+from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
 # define variables
 articles_path = []
 articleTitles = []
 articleData = []
-htmlData = []
-contentData = []
-tokenHtml = []
-tokenContent = []
+wordCount = {}
+tokenTitle = []
 summaryAllArticles = {}
-reliableHTMLTags = {}
-unreliableHTMLTags = {}
+stem = LancasterStemmer()
+
 
 #  a subset of all sources for the articles in the NELA2017 dataset
-# sources = ["AP", "BBC", "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed","Drudge Report","Faking News", "RedState",
-#            "The Gateway Pundit", "The Huffington Post"]
+sources = ["AP", "BBC", "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed", "Drudge Report", "Faking News", "RedState",
+           "The Gateway Pundit", "The Huffington Post"]
 
 # second subset sources used to determine if the results so far are dependent on the current sources being used
 # sources = ["CNN", "MotherJones", "NPR", "PBS", "The Hill", "Vox", "Addicting Info", "New York Daily News", "Prntly",
 #            "The D.C. Clothesline", "The Duran", "Yahoo News"]
 
-# third subset sources used to determine if the results so far are dependent on the current sources being used
-sources = ["Business Insider", "CNBC",  "Daily Buzz Live", "The Atlantic", "The Fiscal Times", "The Guardian", "Xinhua",
-           "Activist Post", "Bipartisan Report", "Breitbart", "Fox News", "Intellihub", "The Spoof", "Washington Examiner"]
+#  set of commonly used words such as "the", "a", "in" etc.
+englishStopWords = set(stopwords.words('english'))
+symbolStopwords = (
+    {":", ";", "'", '"', '”', '“', ",", ".", "-", "_", "?", "$", "&", '...', '.', '�', '!', "''", "``", "%", "@", "--",
+     ")", "(", "[", "]", "[]", "[ ]", "’", "|", "‘", " ", "'s", 'mr', 'mrs', 'one', 'two', 'said', 'hi', 'say', "n't",
+     '—', 'the', 'mr.', 'mrs.', 'get', 'us', ' #', 'jr.', '–', 'i.r.', '■', 'ms.', '__', ''})
+stopwords = englishStopWords.union(symbolStopwords)
 
 #  listdir() returns a list containing the names of the entries in the directory path given
 # ['1_April', '2_May', '3_June', '4_July', '5_August', '6_September', '7_October'] is returned from NELA2017
@@ -51,7 +55,7 @@ for m in month_directories:  # go through all items in month_directories and get
 for s in sources:
     # clear the html data for each source
     summaryAllArticles.clear()
-    if not os.path.isfile("C:/Users/caire/Desktop/OutputData/OutputHtmlArticles3/" + s + ".txt"):
+    if not os.path.isfile("C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputTitleArticles/" + s + ".txt"):
         for p in articles_path:
             for d in p.date:
                 fileFound = True
@@ -65,8 +69,7 @@ for s in sources:
                 if fileFound:  # if the source had articles on that date open all articles using articleTitles list
                     for articleTitle in articleTitles:
                         # empty lists for each iteration of the loop
-                        tokenHtml.clear()
-                        tokenContent.clear()
+                        tokenTitle.clear()
                         articleData.clear()
 
                         if articleTitle != "PaxHeader":
@@ -77,21 +80,31 @@ for s in sources:
                                 try:
                                     articleData = json.load(file)
 
-                                    # save html and content of the json file separately
-                                    tokenHtml = word_tokenize(articleData['html'])
-                                    # tokenContent = word_tokenize(articleData['content'])
+                                    # save content of the json file
+                                    tokenTitle = word_tokenize(articleData['title'])
 
-                                    # add HTML tags from the tokenized data to create a list of all tags for that source
-                                    previousToken = " "
-                                    for token in tokenHtml:
-                                        if len(token) > 1 and token[0] == "/" and token[
-                                            1] != "/" and previousToken == "<":
-                                            htmlData.append(token)
-                                        previousToken = token
+                                    # add word from the tokenized data to create a list of all words for that article
+                                    for word in tokenTitle:
+                                        # convert all words to lower case to avoid duplicates
+                                        word = word.lower()
+                                        #  remove the symbol stopwords
+                                        for char in word:
+                                            if char in symbolStopwords:
+                                                word = word.replace(char, "")
+                                        # check if the word contains a number or is a stopword
+                                        if not any(char.isdigit() for char in word):
+                                            if word not in stopwords:
+                                                # stem words to avoid duplication by pluralization
+                                                word = stem.stem(word)
+                                                # if word isn't already in the dict add it
+                                                if word not in wordCount:
+                                                    wordCount[word] = 1
+                                                else:  # else increase the value of that key in the dict
+                                                    wordCount[word] += 1
+
                                 except ValueError:
                                     print("JsonDecodeError for file " + articleTitle)
-                        if len(htmlData) != 0:
-                            with open("C:/Users/caire/Desktop/OutputData/OutputHtmlArticles3/" + s + ".txt", 'a') as newFile:
-                                newFile.write(str(Counter(htmlData)) + "\n")
-                        htmlData.clear()
-    print(s + "'s tags counted for each article and added to file")
+                        with open("C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputTitleArticles/" + s + ".txt", 'a', encoding='utf-8') as newFile:
+                            newFile.write(str(dict(Counter(wordCount).most_common(10))) + "\n")
+                        wordCount.clear()
+    print(s + "'s title words counted for each article and added to file")
