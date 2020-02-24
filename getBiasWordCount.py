@@ -15,13 +15,15 @@ articleData = []
 wordCount = 0
 tokenContent = []
 
-#  a subset of all sources for the articles in the NELA2017 dataset
-sources = ["AP", "BBC", "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed", "Drudge Report", "Faking News",
-           "RedState", "The Gateway Pundit", "The Huffington Post"]
+# #  a subset of all sources for the articles in the NELA2017 dataset
+# sources = ["AP", "BBC", "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed", "Drudge Report", "Faking News",
+#            "RedState", "The Gateway Pundit", "The Huffington Post"]
 
 # second subset sources used to determine if the results so far are dependent on the current sources being used
-# sources = ["CNN", "MotherJones", "NPR", "PBS", "The Hill", "Vox", "Addicting Info", "New York Daily News", "Prntly",
-#            "The D.C. Clothesline", "The Duran", "Yahoo News"]
+sources = ["CNN", "MotherJones", "NPR", "The Hill", "Vox", "Addicting Info", "New York Daily News", "Prntly",
+           "The D.C. Clothesline", "The Duran", "Yahoo News", "Business Insider", "CNBC",  "Daily Buzz Live",
+           "The Atlantic", "The Fiscal Times", "The Guardian", "Xinhua", "Activist Post", "Bipartisan Report",
+           "Breitbart", "Fox News", "Intellihub", "The Spoof", "Washington Examiner"]
 
 #  set of commonly used words such as "the", "a", "in" etc.
 englishStopWords = set(stopwords.words('english'))

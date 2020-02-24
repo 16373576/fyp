@@ -11,7 +11,7 @@ from matplotlib import pyplot
 
 def main():
     # read in the data and shuffle
-    df = pd.read_csv("C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/outputContentAnalysis.csv",
+    df = pd.read_csv("C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/outputContentAnalysis4.csv",
                      header=0, delimiter=",")
     df = df.sample(frac=1)
 
@@ -23,7 +23,12 @@ def main():
     # data = df[[relevant_features.index[0], relevant_features.index[1], relevant_features.index[2],
     #            relevant_features.index[3], relevant_features.index[4], 'Reliability']]
 
-    data = df[["Article wc", "Title wc", "Article Sentiment", "Article Sentiment", "Reliability"]]
+    data = df[["Article wc", "Title wc", "Article Pos Sentiment", "Article Neu Sentiment", "Article Neg Sentiment",
+                "Article Compound Sentiment", "Title Pos Sentiment", "Title Neu Sentiment", "Title Neg Sentiment",
+                "Title Compound Sentiment", "Article Bias Stopword wc", "Title Bias Stopword wc",
+                "Article Exclamation Count", "Article Cap Count", "Article Number Count", "Article Question Count",
+                "Article Comma Count", "Article Quote Count", "Title Exclamation Count", "Title Cap Count",
+                "Title Number Count", "Title Question Count", "Title Comma Count", "Title Quote Count", "Reliability"]]
 
     # split the data into training and test data
     train_split = int((len(data) * 2) / 3)
@@ -32,7 +37,7 @@ def main():
 
     # fit all models to the data and make predictions
     knn = KNeighborsClassifier(n_neighbors=11)
-    lsvm = SVC(kernel="linear", probability=True)
+    #lsvm = SVC(kernel="linear", probability=True)
     clf = tree.DecisionTreeClassifier()
     naive = GaussianNB()
     logReg = LogisticRegression()
@@ -44,15 +49,15 @@ def main():
     # naive_fpr, naive_tpr, _ = roc_curve(test[:, 5], generate_ROC_curve_data(naive, "Naive Bayes", training, test))
     # log_fpr, log_tpr, _ = roc_curve(test[:, 5], generate_ROC_curve_data(logReg, "Logistic Regression", training, test))
 
-    knn_fpr, knn_tpr, _ = roc_curve(test[:, 4], generate_ROC_curve_data(knn, "KNN", training, test))
-    lsvm_fpr, lsvm_tpr, _ = roc_curve(test[:, 4], generate_ROC_curve_data(lsvm, "LSVM", training, test))
-    clf_fpr, clf_tpr, _ = roc_curve(test[:, 4], generate_ROC_curve_data(clf, "CART", training, test))
-    naive_fpr, naive_tpr, _ = roc_curve(test[:, 4], generate_ROC_curve_data(naive, "Naive Bayes", training, test))
-    log_fpr, log_tpr, _ = roc_curve(test[:, 4], generate_ROC_curve_data(logReg, "Logistic Regression", training, test))
+    knn_fpr, knn_tpr, _ = roc_curve(test[:, 24], generate_ROC_curve_data(knn, "KNN", training, test))
+    #lsvm_fpr, lsvm_tpr, _ = roc_curve(test[:, 18], generate_ROC_curve_data(lsvm, "LSVM", training, test))
+    clf_fpr, clf_tpr, _ = roc_curve(test[:, 24], generate_ROC_curve_data(clf, "CART", training, test))
+    naive_fpr, naive_tpr, _ = roc_curve(test[:, 24], generate_ROC_curve_data(naive, "Naive Bayes", training, test))
+    log_fpr, log_tpr, _ = roc_curve(test[:, 24], generate_ROC_curve_data(logReg, "Logistic Regression", training, test))
 
     # plot the roc curve for the model
     pyplot.plot(knn_fpr, knn_tpr, marker='.', label='KNN')
-    pyplot.plot(lsvm_fpr, lsvm_tpr, marker='.', label='LSVM')
+   # pyplot.plot(lsvm_fpr, lsvm_tpr, marker='.', label='LSVM')
     pyplot.plot(clf_fpr, clf_tpr, marker='.', label='CART')
     pyplot.plot(naive_fpr, naive_tpr, marker='.', label='Naive Bayes')
     pyplot.plot(log_fpr, log_tpr, marker='.', label='Logistic Regression')
@@ -73,15 +78,15 @@ def generate_ROC_curve_data(algorithm, algorithmName, training, test):
     # algorithm.fit(training[:, :4], training[:, 5])
     # algorithm_test_predictions = algorithm.predict_proba(test[:, :4])
 
-    algorithm.fit(training[:, :3], training[:, 4])
-    algorithm_test_predictions = algorithm.predict_proba(test[:, :3])
+    algorithm.fit(training[:, :23], training[:, 24])
+    algorithm_test_predictions = algorithm.predict_proba(test[:, :23])
 
     # keep probabilities for the positive outcome only
     algorithm_test_predictions = algorithm_test_predictions[:, 1]
 
     # calculate and print the ROC AUC scores
     # algorithm_auc = roc_auc_score(test[:, 5], algorithm_test_predictions)
-    algorithm_auc = roc_auc_score(test[:, 4], algorithm_test_predictions)
+    algorithm_auc = roc_auc_score(test[:, 24], algorithm_test_predictions)
     print(algorithmName + ': ROC AUC=%.3f' % algorithm_auc)
 
     # return predictions to be plotted in the curve

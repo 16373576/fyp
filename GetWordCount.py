@@ -15,12 +15,14 @@ wordCount = 0
 tokenContent = []
 
 #  a subset of all sources for the articles in the NELA2017 dataset
-sources = ["AP", "BBC", "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed", "Drudge Report", "Faking News",
-           "RedState", "The Gateway Pundit", "The Huffington Post"]
+# sources = ["AP", "BBC", "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed", "Drudge Report", "Faking News",
+#            "RedState", "The Gateway Pundit", "The Huffington Post"]
 
 # second subset sources used to determine if the results so far are dependent on the current sources being used
-# sources = ["CNN", "MotherJones", "NPR", "PBS", "The Hill", "Vox", "Addicting Info", "New York Daily News", "Prntly",
-#            "The D.C. Clothesline", "The Duran", "Yahoo News"]
+sources = ["CNN", "MotherJones", "NPR", "The Hill", "Vox", "Addicting Info", "New York Daily News", "Prntly",
+           "The D.C. Clothesline", "The Duran", "Yahoo News", "Business Insider", "CNBC",  "Daily Buzz Live",
+           "The Atlantic", "The Fiscal Times", "The Guardian", "Xinhua", "Activist Post", "Bipartisan Report",
+           "Breitbart", "Fox News", "Intellihub", "The Spoof", "Washington Examiner"]
 
 #  set of commonly used words such as "the", "a", "in" etc.
 englishStopWords = set(stopwords.words('english'))
@@ -51,7 +53,7 @@ for m in month_directories:  # go through all items in month_directories and get
 
 #  the path to the files with the HTML is C:/NELA2017/NELA2017.tar/NELA2017/"month"/"date"/"source"/"article_title.txt"
 for s in sources:
-    if not os.path.isfile("C:/Users/caire/Desktop/OutputData/OutputWordCountTitles/" + s + ".txt"):
+    if not os.path.isfile("C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputWordCountArticles/" + s + ".txt"):
         for p in articles_path:
             for d in p.date:
                 fileFound = True
@@ -76,7 +78,7 @@ for s in sources:
                                     articleData = json.load(file)
 
                                     # save content of the json file
-                                    tokenContent = word_tokenize(articleData['title'])
+                                    tokenContent = word_tokenize(articleData['content'])
 
                                     # add word from the tokenized data to create a list of all words for that article
                                     for word in tokenContent:
@@ -92,7 +94,7 @@ for s in sources:
                                                 wordCount = wordCount + 1
                                 except ValueError:
                                     print("JsonDecodeError for file " + articleTitle)
-                        with open("C:/Users/caire/Desktop/OutputData/OutputWordCountTitle/" + s + ".txt", 'a',
+                        with open("C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputWordCountArticles/" + s + ".txt", 'a',
                                   encoding='utf-8') as newFile:
                             newFile.write(str(wordCount) + "\n")
                         wordCount = 0

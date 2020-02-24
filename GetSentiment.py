@@ -20,12 +20,14 @@ tokenTitle = []
 articleData = []
 
 #  a subset of all sources for the articles in the NELA2017 dataset
-sources = ["AP", "BBC", "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed", "Drudge Report", "Faking News",
-           "RedState", "The Gateway Pundit", "The Huffington Post"]
+# sources = ["AP", "BBC", "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed", "Drudge Report", "Faking News",
+#            "RedState", "The Gateway Pundit", "The Huffington Post"]
 
 # second subset sources used to determine if the results so far are dependent on the current sources being used
-# sources = ["CNN", "MotherJones", "NPR", "PBS", "The Hill", "Vox", "Addicting Info", "New York Daily News", "Prntly",
-#            "The D.C. Clothesline", "The Duran", "Yahoo News"]
+sources = ["CNN", "MotherJones", "NPR", "The Hill", "Vox", "Addicting Info", "New York Daily News", "Prntly",
+           "The D.C. Clothesline", "The Duran", "Yahoo News", "Business Insider", "CNBC",  "Daily Buzz Live",
+           "The Atlantic", "The Fiscal Times", "The Guardian", "Xinhua", "Activist Post", "Bipartisan Report",
+           "Breitbart", "Fox News", "Intellihub", "The Spoof", "Washington Examiner"]
 
 #  set of commonly used words such as "the", "a", "in" etc.
 englishStopWords = set(stopwords.words('english'))
@@ -58,7 +60,7 @@ for m in month_directories:  # go through all items in month_directories and get
 
 for s in sources:
     if not os.path.isfile(
-            "C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputTitleSentiment/" + s + ".txt"):
+            "C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputWordSentiment/" + s + ".txt"):
         for p in articles_path:
             for d in p.date:
                 fileFound = True
@@ -84,7 +86,7 @@ for s in sources:
                                     articleData = json.load(file)
 
                                     # save content of the json file
-                                    tokenTitle = word_tokenize(articleData['title'])
+                                    tokenTitle = word_tokenize(articleData['content'])
 
                                     for word in tokenTitle:
                                         # convert all words to lower case to avoid duplicates
@@ -108,7 +110,7 @@ for s in sources:
                                 stringArticle = stringArticle + " " + articleWords[i]
                         scores = analyzer.polarity_scores(stringArticle)
                         with open(
-                                "C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputTitleSentiment/" + s + ".txt",
+                                "C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputWordSentiment/" + s + ".txt",
                                 'a', encoding='utf-8') as newFile:
                             newFile.write(str(scores.get("pos")) + ", " + str(scores.get("neu")) + ", " + str(scores.get("neg")) + ", " + str(scores.get("compound")) + "\n")
                         stringArticle = ""
