@@ -5,7 +5,6 @@ from sklearn.svm import LinearSVC
 from sklearn.linear_model import LogisticRegression
 import pandas as pd
 from sklearn import tree
-from dtreeplt import dtreeplt
 
 
 def main():
