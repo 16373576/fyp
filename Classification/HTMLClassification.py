@@ -10,7 +10,7 @@ from sklearn import tree
 def main():
     # read in the data from the .csv file and shuffle
     df = pd.read_csv(
-        "C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/outputContentAnalysis4.csv",
+        "C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/outputContentAnalysisNormalized.csv",
         header=0, delimiter=",")
     df = df.sample(frac=1)
 
@@ -18,13 +18,13 @@ def main():
     labels = df["Reliability"]
 
     # conduct feature selection so the algorithms will run faster as now only the 5 most related attributes are used
-    # data = feature_selection(df)
-    data = df[["Article wc", "Title wc", "Article Pos Sentiment", "Article Neu Sentiment", "Article Neg Sentiment",
-                "Article Compound Sentiment", "Title Pos Sentiment", "Title Neu Sentiment", "Title Neg Sentiment",
-                "Title Compound Sentiment", "Article Bias Stopword wc", "Title Bias Stopword wc",
-                "Article Exclamation Count", "Article Cap Count", "Article Number Count", "Article Question Count",
-                "Article Comma Count", "Article Quote Count", "Title Exclamation Count", "Title Cap Count",
-                "Title Number Count", "Title Question Count", "Title Comma Count", "Title Quote Count"]]
+    data = feature_selection(df)
+    # data = df[["Article wc", "Title wc", "Article Pos Sentiment", "Article Neu Sentiment", "Article Neg Sentiment",
+    #             "Article Compound Sentiment", "Title Pos Sentiment", "Title Neu Sentiment", "Title Neg Sentiment",
+    #             "Title Compound Sentiment", "Article Bias wc", "Title Bias wc", "Article Stopword wc", "Title Stopword wc",
+    #             "Article Exclamation Count", "Article Cap Count", "Article Number Count", "Article Question Count",
+    #             "Article Comma Count", "Article Quote Count", "Title Exclamation Count", "Title Cap Count",
+    #             "Title Number Count", "Title Question Count", "Title Comma Count", "Title Quote Count"]]
 
     # initialise the algorithms and fit to the data
     knn = KNeighborsClassifier(n_neighbors=11)
@@ -55,7 +55,7 @@ def cross_validation_test(algorithm, algorithm_name, data, results):
 def feature_selection(dataframe):
     cor = dataframe.corr(method='pearson')
     cor_target = abs(cor["Reliability"])
-    relevant_features = cor_target[cor_target > 0]
+    relevant_features = cor_target[cor_target > 0.13]
     print(relevant_features)
     data = dataframe[[relevant_features.index[0], relevant_features.index[1], relevant_features.index[2],
                       relevant_features.index[3], relevant_features.index[4]]]

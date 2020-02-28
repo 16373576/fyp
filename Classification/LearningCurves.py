@@ -10,24 +10,17 @@ from matplotlib import pyplot
 
 def main():
     # read in the .csv file and shuffle
-    df = pd.read_csv("C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/outputContentAnalysis4.csv",
+    df = pd.read_csv("C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/outputContentAnalysisNormalized.csv",
                      header=0, delimiter=",")
     df = df.sample(frac=1)
 
     # # find the attributes with the highest correlation to the class
-    # cor = df.corr(method='pearson')
-    # cor_target = abs(cor["Reliability"])
-    # relevant_features = cor_target[cor_target > 0.2826]
-    # print(relevant_features)
-    # data = df[[relevant_features.index[0], relevant_features.index[1], relevant_features.index[2],
-    #            relevant_features.index[3], relevant_features.index[4], 'Reliability']]
-
-    data = df[["Article wc", "Title wc", "Article Pos Sentiment", "Article Neu Sentiment", "Article Neg Sentiment",
-                "Article Compound Sentiment", "Title Pos Sentiment", "Title Neu Sentiment", "Title Neg Sentiment",
-                "Title Compound Sentiment", "Article Bias Stopword wc", "Title Bias Stopword wc",
-                "Article Exclamation Count", "Article Cap Count", "Article Number Count", "Article Question Count",
-                "Article Comma Count", "Article Quote Count", "Title Exclamation Count", "Title Cap Count",
-                "Title Number Count", "Title Question Count", "Title Comma Count", "Title Quote Count", "Reliability"]]
+    cor = df.corr(method='pearson')
+    cor_target = abs(cor["Reliability"])
+    relevant_features = cor_target[cor_target > 0.13]
+    print(relevant_features)
+    data = df[[relevant_features.index[0], relevant_features.index[1], relevant_features.index[2],
+               relevant_features.index[3], relevant_features.index[4], 'Reliability']]
 
     # split into training and test datasets
     train_split = int((len(data) * 2) / 3)
@@ -50,38 +43,28 @@ def main():
         print(instances)
         instance.append(instances)
         knn = KNeighborsClassifier(n_neighbors=11)
-        # knn.fit(training[0:instances, :4], training[0:instances, 5])
-        # knn_test_predictions = knn.predict(test[:, :4])
-        knn.fit(training[0:instances, :23], training[0:instances, 24])
-        knn_test_predictions = knn.predict(test[:, :23])
+        knn.fit(training[0:instances, :4], training[0:instances, 5])
+        knn_test_predictions = knn.predict(test[:, :4])
         knn_learningCurve_accuracy.append((metrics.accuracy_score(test[:, -1], knn_test_predictions)) * 100)
 
         lsvm = LinearSVC()
-        # lsvm.fit(training[0:instances, :4], training[0:instances, 5])
-        # lsvm_test_predictions = lsvm.predict(test[:, :4])
-        lsvm.fit(training[0:instances, :23], training[0:instances, 24])
-        lsvm_test_predictions = lsvm.predict(test[:, :23])
+        lsvm.fit(training[0:instances, :4], training[0:instances, 5])
+        lsvm_test_predictions = lsvm.predict(test[:, :4])
         lsvm_learningCurve_accuracy.append((metrics.accuracy_score(test[:, -1], lsvm_test_predictions)) * 100)
 
         clf = tree.DecisionTreeClassifier()
-        # clf.fit(training[0:instances, :4], training[0:instances, 5])
-        # clf_test_predictions = clf.predict(test[:, :4])
-        clf.fit(training[0:instances, :23], training[0:instances, 24])
-        clf_test_predictions = clf.predict(test[:, :23])
+        clf.fit(training[0:instances, :4], training[0:instances, 5])
+        clf_test_predictions = clf.predict(test[:, :4])
         clf_learningCurve_accuracy.append((metrics.accuracy_score(test[:, -1], clf_test_predictions)) * 100)
 
         naive = GaussianNB()
-        # naive.fit(training[0:instances, :4], training[0:instances, 5])
-        # naive_test_predictions = naive.predict(test[:, :4])
-        naive.fit(training[0:instances, :23], training[0:instances, 24])
-        naive_test_predictions = naive.predict(test[:, :23])
+        naive.fit(training[0:instances, :4], training[0:instances, 5])
+        naive_test_predictions = naive.predict(test[:, :4])
         naive_learningCurve_accuracy.append((metrics.accuracy_score(test[:, -1], naive_test_predictions)) * 100)
 
         logReg = LogisticRegression()
-        # logReg.fit(training[0:instances, :4], training[0:instances, 5])
-        # logReg_test_predictions = logReg.predict(test[:, :4])
-        logReg.fit(training[0:instances, :23], training[0:instances, 24])
-        logReg_test_predictions = logReg.predict(test[:, :23])
+        logReg.fit(training[0:instances, :4], training[0:instances, 5])
+        logReg_test_predictions = logReg.predict(test[:, :4])
         logReg_learningCurve_accuracy.append((metrics.accuracy_score(test[:, -1], logReg_test_predictions)) * 100)
 
     # plot the roc curve for the model
