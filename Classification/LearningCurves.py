@@ -80,6 +80,8 @@ def main():
     pyplot.ylabel('Accuracy (%)')
     # show the legend
     pyplot.legend()
+    axes = pyplot.gca()
+    axes.set_ylim([0, 100])
     pyplot.savefig('learningCurve.png', bbox_inches='tight')
     # show the plot
     pyplot.show()
