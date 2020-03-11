@@ -1,0 +1,180 @@
+import numpy as np
+
+
+def main():
+    #  a subset of all sources for the articles in the NELA2017 dataset
+    sources = ["AP", "BBC", "PBS", "Salon", "Slate", "The New York Times", "BuzzFeed", "Drudge Report", "Faking News",
+               "RedState", "The Gateway Pundit", "The Huffington Post", "CNN", "MotherJones", "NPR", "The Hill", "Vox",
+               "Addicting Info", "New York Daily News", "Prntly", "The D.C. Clothesline", "The Duran", "Yahoo News",
+               "Business Insider", "CNBC",  "Daily Buzz Live", "The Atlantic", "The Fiscal Times", "The Guardian",
+               "Xinhua", "Activist Post", "Bipartisan Report", "Breitbart", "Fox News", "Intellihub", "The Spoof",
+               "Washington Examiner"]
+
+    listOfArticleWordCount = getArticleWordCount(sources)
+
+    listOfTitleWordCount = getTitleWordCount(sources)
+
+    listOfArticleSentiment = getArticleSentiment(sources)
+
+    listOfTitleSentiment = getTitleSentiment(sources)
+
+    listOfArticleBiasCount = getArticleBiaswordCount(sources)
+
+    listOfTitleBiasCount = getTitleBiaswordCount(sources)
+
+    listOfArticleStopCount = getArticleStopwordCount(sources)
+
+    listOfTitleStopCount = getTitleStopwordCount(sources)
+
+    listOfArticleCapCount = getArticleCapCount(sources)
+
+    listOfTitleCapCount = getTitleCapCount(sources)
+
+    headings = ["Article wc", "Title wc", "Article Pos Sentiment", "Article Neu Sentiment", "Article Neg Sentiment",
+                "Article Compound Sentiment", "Title Pos Sentiment", "Title Neu Sentiment", "Title Neg Sentiment",
+                "Title Compound Sentiment", "Article Bias wc", "Title Bias wc", "Article Stopword wc", "Title Stopword wc",
+                "Article Exclamation Count", "Article Cap Count", "Article Number Count", "Article Question Count",
+                "Article Comma Count", "Article Quote Count", "Title Exclamation Count", "Title Cap Count",
+                "Title Number Count", "Title Question Count", "Title Comma Count", "Title Quote Count",
+                "Source", "Reliability"]
+
+    listForClassification = [headings]
+    for i in range(len(listOfArticleWordCount)):
+        articleCount = listOfArticleWordCount[i]
+        titleCount = listOfTitleWordCount[i]
+        articleSentiment = listOfArticleSentiment[i]
+        titleSentiment = listOfTitleSentiment[i]
+        articleBiasCount = listOfArticleBiasCount[i]
+        titleBiasCount = listOfTitleBiasCount[i]
+        articleStopCount = listOfArticleStopCount[i]
+        titleStopCount = listOfTitleStopCount[i]
+        articleCapCount = listOfArticleCapCount[i]
+        titleCapCount = listOfTitleCapCount[i]
+        contentForArticle = articleCount + "," + titleCount + "," + articleSentiment + "," + titleSentiment + "," + articleBiasCount + "," + titleBiasCount + "," + articleStopCount + "," + titleStopCount + "," + articleCapCount + "," + titleCapCount
+        listForClassification.append(contentForArticle)
+    listForExcel = np.hstack(listForClassification)
+    np.savetxt("C:/Users/caire/Desktop/OutputData/OutputHtmlExcel/outputContentAnalysis5.csv", listForExcel,
+               delimiter="\n", fmt='%s')
+
+
+def getArticleWordCount(sources):
+    listOfArticleWordCount = []
+    for s in sources:
+        with open(
+                "C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputWordCountArticles/" + s + ".txt") as file:
+            print("adding article word count for " + s)
+            for cnt, line in enumerate(file):
+                line = line.replace("\n", "")
+                listOfArticleWordCount.append(line)
+    return listOfArticleWordCount
+
+
+def getTitleWordCount(sources):
+    listOfTitleWordCount = []
+    for s in sources:
+        with open(
+                "C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputWordCountTitle/" + s + ".txt") as file:
+            print("adding title word count for " + s)
+            for cnt, line in enumerate(file):
+                line = line.replace("\n", "")
+                listOfTitleWordCount.append(line)
+    return listOfTitleWordCount
+
+
+def getArticleSentiment(sources):
+    listOfArticleSentiment = []
+    for s in sources:
+        with open(
+                "C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputWordSentiment/" + s + ".txt") as file:
+            print("adding article sentiments for " + s)
+            for cnt, line in enumerate(file):
+                line = line.replace("\n", "")
+                listOfArticleSentiment.append(line)
+    return listOfArticleSentiment
+
+
+def getTitleSentiment(sources):
+    listOfTitleSentiment = []
+    for s in sources:
+        with open(
+                "C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputTitleSentiment/" + s + ".txt") as file:
+            print("adding title sentiment for " + s)
+            for cnt, line in enumerate(file):
+                line = line.replace("\n", "")
+                listOfTitleSentiment.append(line)
+    return listOfTitleSentiment
+
+
+def getArticleBiaswordCount(sources):
+    listOfArticleBiasCount = []
+    for s in sources:
+        with open(
+                "C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputBiasCountContent/" + s + ".txt") as file:
+            print("adding article bias word count " + s)
+            for cnt, line in enumerate(file):
+                line = line.replace("\n", "")
+                listOfArticleBiasCount.append(line)
+    return listOfArticleBiasCount
+
+
+def getTitleBiaswordCount(sources):
+    listOfTitleBiasCount = []
+    for s in sources:
+        with open(
+                "C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputBiasCountTitle/" + s + ".txt") as file:
+            print("adding title bias word count " + s)
+            for cnt, line in enumerate(file):
+                line = line.replace("\n", "")
+                listOfTitleBiasCount.append(line)
+    return listOfTitleBiasCount
+
+
+def getArticleStopwordCount(sources):
+    listOfArticleStopCount = []
+    for s in sources:
+        with open(
+                "C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputStopCountContent/" + s + ".txt") as file:
+            print("adding article stop word count " + s)
+            for cnt, line in enumerate(file):
+                line = line.replace("\n", "")
+                listOfArticleStopCount.append(line)
+    return listOfArticleStopCount
+
+
+def getTitleStopwordCount(sources):
+    listOfTitleStopCount = []
+    for s in sources:
+        with open(
+                "C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputStopCountTitle/" + s + ".txt") as file:
+            print("adding title stop word count " + s)
+            for cnt, line in enumerate(file):
+                line = line.replace("\n", "")
+                listOfTitleStopCount.append(line)
+    return listOfTitleStopCount
+
+
+def getArticleCapCount(sources):
+    listOfArticleCapCount = []
+    for s in sources:
+        with open(
+                "C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputCapCountContent/" + s + ".txt") as file:
+            print("adding article cap count " + s)
+            for cnt, line in enumerate(file):
+                line = line.replace("\n", "")
+                listOfArticleCapCount.append(line)
+    return listOfArticleCapCount
+
+
+def getTitleCapCount(sources):
+    listOfTitleCapCount = []
+    for s in sources:
+        with open(
+                "C:/Users/caire/Desktop/OutputData/ClassifyArticlesContentandTitle/OutputCapCountTitle/" + s + ".txt") as file:
+            print("adding title cap count " + s)
+            for cnt, line in enumerate(file):
+                line = line.replace("\n", "")
+                listOfTitleCapCount.append(line + "," + s)
+    return listOfTitleCapCount
+
+
+main()
